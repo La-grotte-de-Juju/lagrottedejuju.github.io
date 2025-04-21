@@ -1,14 +1,13 @@
 {
   "name": "nextjs-shadcn",
-  "version": "1.0.1",
+  "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev -H 0.0.0.0",
     "build": "next build && touch out/.nojekyll",
     "start": "next start",
     "lint": "bunx biome lint --write && bunx tsc --noEmit",
-    "format": "bunx biome format --write",
-    "test": "jest"
+    "format": "bunx biome format --write"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.3",
