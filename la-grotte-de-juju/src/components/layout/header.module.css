@@ -1,0 +1,82 @@
+.headerButton {
+  position: relative;
+  overflow: hidden;
+  transform: translateZ(0);
+  transition: transform 0.4s cubic-bezier(0.33, 1, 0.68, 1), 
+              background-color 0.3s cubic-bezier(0.33, 1, 0.68, 1),
+              box-shadow 0.4s cubic-bezier(0.33, 1, 0.68, 1) !important;
+}
+
+.headerButton::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    hsla(var(--primary), 0.2) 50%,
+    transparent 100%
+  );
+  transform: skewX(-20deg);
+  transition: left 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.headerButton:hover::before {
+  left: 100%;
+}
+
+.headerButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 10px 2px hsla(var(--primary), 0.3),
+              0 0 20px 5px hsla(var(--primary), 0.1);
+}
+
+.glowEffect {
+  animation: headerButtonGlow 2s infinite;
+}
+
+@keyframes headerButtonGlow {
+  0% {
+    box-shadow: 0 0 0 0 hsla(var(--primary), 0.4);
+  }
+  50% {
+    box-shadow: 0 0 10px 2px hsla(var(--primary), 0.2);
+  }
+  100% {
+    box-shadow: 0 0 0 0 hsla(var(--primary), 0);
+  }
+}
+
+/* Styles supplémentaires pour le menu mobile */
+.mobileButton {
+  width: 100%;
+  text-align: left;
+  justify-content: flex-start;
+  border-radius: 0.375rem;
+  padding: 0.625rem 1rem;
+}
+
+.mobileButton:hover {
+  background-color: hsla(var(--primary), 0.1);
+}
+
+/* Animation d'entrée pour les sous-menus */
+.submenuEnter {
+  animation: slideDown 0.3s ease forwards;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
