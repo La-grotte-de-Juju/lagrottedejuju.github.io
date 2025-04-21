@@ -1,58 +1,149 @@
-.headerButton {
-  position: relative;
-  overflow: hidden;
-  transform: translateZ(0);
-  transition: transform 0.4s cubic-bezier(0.33, 1, 0.68, 1), 
-              background-color 0.3s cubic-bezier(0.33, 1, 0.68, 1),
-              box-shadow 0.4s cubic-bezier(0.33, 1, 0.68, 1) !important;
+/* New styles for the capsule navbar */
+.navbarCapsule {
+  /* Utiliser un fond clair semi-transparent avec flou */
+  background-color: hsla(0, 0%, 100%, 0.8); /* Blanc semi-transparent */
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border-radius: 9999px; /* Fully rounded pill shape - Initial state */
+  padding: 0.15rem 0.5rem; 
+  border: 1px solid hsla(0, 0%, 0%, 0.05); /* Bordure sombre très subtile */
+  box-shadow: 0 4px 15px -3px hsla(0, 0%, 0%, 0.1), 0 2px 6px -4px hsla(0, 0%, 0%, 0.1); /* Ombre adaptée pour fond clair */
+  display: inline-flex;
+  flex-direction: column;
+  max-width: 95vw; 
+  min-width: 150px; 
+  min-height: 1rem; 
 }
 
-.headerButton::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -100%;
+/* Adjusted styles for buttons inside the capsule */
+.headerButtonCapsule {
+  color: hsl(var(--foreground)); /* Utiliser la couleur de texte par défaut (sombre) */
+  padding: 0.5rem; 
+  border-radius: 9999px;
+  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.headerButtonCapsule:hover {
+  background-color: hsla(var(--foreground), 0.05); /* Léger fond au survol */
+}
+
+.headerButtonCapsule:focus-visible {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 2px;
+}
+
+/* Mega Menu Backdrop */
+.megaMenuBackdrop {
+  position: fixed;
+  inset: 0;
+  background-color: hsla(0, 0%, 0%, 0.1); /* Fond plus clair pour le backdrop */
+  z-index: 55;
+  -webkit-backdrop-filter: blur(8px); /* Flou légèrement réduit */
+  backdrop-filter: blur(8px);
+}
+
+/* Mega Menu Content Area */
+.megaMenuContent {
   width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    hsla(var(--primary), 0.2) 50%,
-    transparent 100%
-  );
-  transform: skewX(-20deg);
-  transition: left 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-  pointer-events: none;
-  z-index: 1;
+  transform-origin: top;
+  padding: 1.5rem; 
+  margin-top: 0.5rem; 
+  /* Le fond est défini dynamiquement dans Header.tsx */
+  overscroll-behavior: contain; /* Prevent body scroll when menu is scrolled */
 }
 
-.headerButton:hover::before {
-  left: 100%;
+/* New styles for the improved Mega Menu */
+.megaMenuGrid {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 2rem; /* Increased gap */
 }
 
-.headerButton:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 0 10px 2px hsla(var(--primary), 0.3),
-              0 0 20px 5px hsla(var(--primary), 0.1);
-}
-
-.glowEffect {
-  animation: headerButtonGlow 2s infinite;
-}
-
-@keyframes headerButtonGlow {
-  0% {
-    box-shadow: 0 0 0 0 hsla(var(--primary), 0.4);
+/* Mobile specific adjustments */
+@media (max-width: 767px) {
+  .megaMenuContent {
+    padding: 1rem; /* Reduced padding for mobile */
+    position: fixed; /* Position fixed to viewport */
+    /* Use inset for positioning */
+    inset: 60px 0 0 0; /* top: 60px, left: 0, right: 0, bottom: 0 */
+    height: calc(100vh - 60px); /* Explicitly set height */
+    width: 100vw; /* Explicitly set width */
+    margin-top: 0; /* Reset margin */
+    border-radius: 0; /* Remove border radius for full screen */
+    overflow-y: auto; /* Enable vertical scroll */
+    background-color: hsl(var(--background)); /* Ensure background is set */
+    z-index: 60; /* Ensure content is above backdrop */
+    /* Reset transform origin if it causes issues with fixed positioning */
+    transform-origin: center center;
   }
-  50% {
-    box-shadow: 0 0 10px 2px hsla(var(--primary), 0.2);
+  .megaMenuGrid {
+    gap: 1rem; /* Reduced gap for mobile */
+    /* Ensure grid takes full width */
+    width: 100%;
   }
-  100% {
-    box-shadow: 0 0 0 0 hsla(var(--primary), 0);
+  .megaMenuTitle {
+     font-size: 0.95rem; /* Slightly smaller title on mobile */
+  }
+  .megaMenuLink {
+    padding: 0.5rem 0.75rem; /* Reduced padding for links on mobile */
+    font-size: 0.85rem; /* Slightly smaller link text on mobile */
   }
 }
 
-/* Styles supplémentaires pour le menu mobile */
+@media (min-width: 768px) { /* md breakpoint */
+  .megaMenuGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) { /* lg breakpoint */
+  .megaMenuGrid {
+    /* Change to horizontal flow */
+    grid-auto-flow: column; 
+    grid-auto-columns: max-content; /* Adjust column width based on content */
+    justify-content: center; /* Center the items horizontally */
+    gap: 5rem; /* Further increased gap between columns */
+  }
+}
+
+.megaMenuColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem; 
+}
+
+.megaMenuTitle {
+  display: flex;
+  align-items: center;
+  font-weight: 600; 
+  font-size: 1rem; 
+  margin-bottom: 0.5rem; 
+  color: hsl(var(--foreground)); /* Couleur de texte sombre pour les titres */
+  white-space: nowrap; 
+}
+
+.megaMenuLink {
+  display: flex; 
+  align-items: center; 
+  padding: 0.6rem 0.8rem; 
+  border-radius: 0.5rem; 
+  font-size: 0.9rem; 
+  color: hsl(var(--muted-foreground)); /* Couleur de texte sombre mais atténuée */
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out; 
+  position: relative; 
+  overflow: hidden; 
+}
+
+.megaMenuLink:hover {
+  color: hsl(var(--foreground)); /* Couleur de texte sombre standard au survol */
+  background-color: hsla(var(--foreground), 0.05); /* Léger fond au survol */
+}
+
+/* Keep mobile styles if still relevant (maybe for links inside mega menu?) */
 .mobileButton {
   width: 100%;
   text-align: left;
@@ -63,20 +154,4 @@
 
 .mobileButton:hover {
   background-color: hsla(var(--primary), 0.1);
-}
-
-/* Animation d'entrée pour les sous-menus */
-.submenuEnter {
-  animation: slideDown 0.3s ease forwards;
-}
-
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }

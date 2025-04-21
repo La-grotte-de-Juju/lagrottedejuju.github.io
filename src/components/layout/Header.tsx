@@ -3,21 +3,37 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, X, AlertTriangle, Bug } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { HeaderButton } from "@/components/ui/header-button";
+import { 
+  Menu, X, AlertTriangle, Bug, LayoutGrid, 
+  Brush, BookOpen, Clapperboard, Youtube, ChevronRight, Home
+} from "lucide-react";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import styles from './header.module.css';
 import { usePathname } from 'next/navigation';
-// Version du site
-const SITE_VERSION = "testchannel-verbêta-1.0.1"; // La version actuelle du site
+
+const SITE_VERSION = "testchannel-verbêta-1.1.0";
 const DEV_TITLE = "Site en Développement";
 const DEV_MESSAGE = "Certaines fonctionnalités peuvent ne pas être disponibles.";
-const DEV_IMAGE = "/images/dev%20img/indev.webp"; // Chemin vers l'image de développement
+const DEV_IMAGE = "/images/dev%20img/indev.webp";
 
 const menuItems = [
   {
+    title: "Série",
+    href: "/series",
+    icon: Clapperboard,
+    submenu: [
+      { title: "Batlife", href: "/series/batlife" },
+      { title: "Chasseurs de Sorciers", href: "/series/chasseurs-de-sorciers" },
+      { title: "Tower of Babel", href: "/series/tower-of-babel" },
+      { title: "Templier vs Sorcier", href: "/series/templier-vs-sorcier" },
+      { title: "Prism", href: "/series/prism" },
+    ],
+  },
+  {
     title: "Dessins et BD",
+    href: "/dessins",
+    icon: Brush,
     submenu: [
       { title: "Strip", href: "/dessins/strip" },
       { title: "Grand Strip", href: "/dessins/grand-strip" },
@@ -28,88 +44,154 @@ const menuItems = [
   },
   {
     title: "Univers de la grotte",
+    href: "/univers",
+    icon: BookOpen,
     submenu: [
       { title: "Le lore", href: "/univers/lore" },
       { title: "Fiches des personnages", href: "/univers/personnages" },
     ],
   },
-  {
-    title: "Série",
-    submenu: [
-      { title: "Batlife", href: "/series/batlife" },
-      { title: "Chasseurs de Sorciers", href: "/series/chasseurs-de-sorciers" },
-      { title: "Tower of Babel", href: "/series/tower-of-babel" },
-      { title: "Templier vs Sorcier", href: "/series/templier-vs-sorcier" },
-      { title: "Prism", href: "/series/prism" },
-    ],
-  },
-  {
-    title: "Actu YouTube",
-    submenu: [
-      { title: "Dernières vidéos", href: "/actu/dernieres-videos" },
-      { title: "YouTube bonus", href: "/actu/youtube-bonus" },
-      { title: "Rediff Live", href: "/actu/rediff-live" },
-    ],
-  },
 ];
 
+// Shared spring transition for layout and appearance
+const capsuleSpringTransition = {
+  type: "spring",
+  stiffness: 400,
+  damping: 35,
+};
+
+// Variants for the main capsule animation
+const capsuleVariants = {
+  hidden: { 
+    y: -100, 
+    opacity: 0 
+  },
+  visible: (isMegaMenuOpen: boolean) => ({
+    y: 0,
+    opacity: 1,
+    borderRadius: isMegaMenuOpen ? "1.5rem" : "9999px",
+    backgroundColor: isMegaMenuOpen ? "hsla(0, 0%, 98%, 0.9)" : "hsla(0, 0%, 100%, 0.8)", 
+    backdropFilter: isMegaMenuOpen ? "blur(18px) saturate(180%)" : "blur(16px) saturate(180%)",
+    boxShadow: isMegaMenuOpen 
+      ? "0 10px 25px -5px hsla(0, 0%, 0%, 0.15), 0 8px 10px -6px hsla(0, 0%, 0%, 0.1)" 
+      : "0 4px 15px -3px hsla(0, 0%, 0%, 0.1), 0 2px 6px -4px hsla(0, 0%, 0%, 0.1)",
+    border: isMegaMenuOpen ? "1px solid hsla(0, 0%, 0%, 0.08)" : "1px solid hsla(0, 0%, 0%, 0.05)",
+    transition: {
+      y: { type: 'spring', stiffness: 120, damping: 20, delay: 0.5 },
+      opacity: { duration: 0.3, delay: 0.5 },
+      default: { duration: 0 }
+    }
+  }),
+};
+
+// Modifier les variants pour synchroniser les animations
+const backdropVariants = {
+  open: {
+    opacity: 1,
+    transition: {
+      duration: 0.3
+    }
+  },
+  closed: {
+    opacity: 0,
+    transition: {
+      duration: 0.3
+    }
+  }
+};
+
+// Remplacer les contentVariants existants par cette version améliorée
+const contentVariants = {
+  open: {
+    scale: 1,
+    opacity: 1,
+    y: 0,
+    transition: {
+      type: "spring",
+      bounce: 0.1,
+      duration: 0.5,
+      delayChildren: 0.1,
+      staggerChildren: 0.05
+    }
+  },
+  closed: {
+    scale: 0.95,
+    opacity: 0,
+    y: -5,
+    transition: {
+      type: "spring",
+      bounce: 0,
+      duration: 0.4,
+      staggerChildren: 0.05,
+      staggerDirection: -1,
+      scale: { duration: 0.25, ease: "easeIn" },
+      y: { duration: 0.2, ease: "easeIn" },
+      opacity: { duration: 0.25, ease: "easeIn" }
+    }
+  }
+};
+
+// Ajouter ces variants pour les éléments enfants
+const itemVariants = {
+  open: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      type: "spring",
+      stiffness: 300,
+      damping: 24
+    }
+  },
+  closed: {
+    opacity: 0,
+    y: 20,
+    transition: {
+      duration: 0.2
+    }
+  }
+};
+
+const devCardVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: -20, transition: { duration: 0.2 } }
+};
+
 export function Header() {
-  const [activeMenu, setActiveMenu] = useState<string | null>(null);
+  const [isMegaMenuOpen, setIsMegaMenuOpen] = useState(false);
   const [showDevCard, setShowDevCard] = useState(true);
   const [isClosing, setIsClosing] = useState(false);
   const pathname = usePathname();
+  const shouldReduceMotion = useReducedMotion();
 
   useEffect(() => {
-    // Afficher la carte à chaque changement de route
+    setIsMegaMenuOpen(false);
     setShowDevCard(true);
     setIsClosing(false);
-  }, [pathname]); // Se déclenche à chaque changement de chemin URL
+  }, [pathname]);
 
-  const toggleMenu = (menuTitle: string) => {
-    setActiveMenu(activeMenu === menuTitle ? null : menuTitle);
+  const toggleMegaMenu = () => {
+    setIsMegaMenuOpen(!isMegaMenuOpen);
   };
 
   const dismissDevCard = () => {
-    // Déclencher l'animation de fermeture
     setIsClosing(true);
-    
-    // Attendre que l'animation soit terminée avant de cacher complètement la carte
     setTimeout(() => {
       setShowDevCard(false);
       setIsClosing(false);
-    }, 500); // Augmentation du délai pour permettre l'animation complète
+    }, 500);
   };
 
   const reportBug = () => {
-    // Ici vous pourriez ouvrir un formulaire de rapport de bug ou rediriger vers une page dédiée
-    window.open('https://docs.google.com/forms/d/e/1FAIpQLSd6ue-eDoyzwTqSxM_fczARh9U-O2VOH5l6J0un5HDs3SntaQ/viewform?usp=dialog', '_blank');
-  };
-
-  // Animation variants pour les éléments du menu
-  const menuItemVariants = {
-    hover: {
-      scale: 1.05,
-      transition: { duration: 0.2 }
-    },
-    tap: {
-      scale: 0.95,
+    // Ensure window is defined (only run on client-side)
+    if (typeof window !== 'undefined') { 
+      window.open('https://form.typeform.com/to/DEoa7nkM', '_blank');
     }
   };
 
-  // Animation variants pour la carte de développement
-  const cardVariants = {
-    hidden: { opacity: 0, y: 100 },
-    visible: { 
-      opacity: 1, 
-      y: 0,
-      transition: { type: "spring", stiffness: 300 }
-    },
-    exit: { 
-      opacity: 1,
-      y: 500, // Valeur beaucoup plus grande pour assurer que la carte sorte complètement de l'écran
-      transition: { type: "tween", ease: "easeIn", duration: 0.4 } // Légère augmentation de la durée
-    }
-  };
+  const dynamicTransition = shouldReduceMotion 
+    ? { duration: 0 }
+    : capsuleSpringTransition;
 
   return (
     <>
@@ -120,8 +202,8 @@ export function Header() {
             initial="hidden"
             animate={isClosing ? "exit" : "visible"}
             exit="exit"
-            variants={cardVariants}
-            key={pathname} // Force la réanimation à chaque changement de route
+            variants={devCardVariants}
+            key={pathname}
           >
             <div className="relative h-32 w-full overflow-hidden">
               <Image 
@@ -132,7 +214,6 @@ export function Header() {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
             </div>
-
             <div className="p-4">
               <div className="flex items-center mb-1">
                 <AlertTriangle className="h-5 w-5 text-yellow-400 mr-2" />
@@ -143,9 +224,8 @@ export function Header() {
                 <p>Version actuelle : {SITE_VERSION}</p>
               </div>
               <br />
-              
               <div className="flex justify-between">
-                <Button 
+                <HeaderButton 
                   variant="outline" 
                   size="sm" 
                   onClick={reportBug}
@@ -153,137 +233,142 @@ export function Header() {
                 >
                   <Bug className="h-4 w-4" />
                   Signaler un bug
-                </Button>
-                
-                <Button 
+                </HeaderButton>
+                <HeaderButton 
                   variant="destructive" 
                   size="sm" 
                   onClick={dismissDevCard}
                   className="ml-2"
                 >
                   Fermer
-                </Button>
+                </HeaderButton>
               </div>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
-      
-      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-16 items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Link href="/" className="flex items-center gap-2">
-              <Image
-                src="/images/juju-logo.webp"
-                alt="La grotte de Juju"
-                width={40}
-                height={40}
-                className="rounded-full"
-              />
-              <span className="font-bold text-xl hidden sm:inline-block">La Grotte de Juju</span>
+
+      <AnimatePresence>
+        {isMegaMenuOpen && (
+          <motion.div
+            className={styles.megaMenuBackdrop}
+            initial="closed"
+            animate="open"
+            exit="closed"
+            variants={backdropVariants}
+            onClick={toggleMegaMenu}
+          />
+        )}
+      </AnimatePresence>
+
+      <header className={`fixed top-4 left-1/2 -translate-x-1/2 z-[60] w-auto`}>
+        <motion.div
+          className={`container flex flex-col h-auto items-center justify-center ${styles.navbarCapsule}`}
+          layout
+          initial="hidden"
+          animate="visible"
+          variants={capsuleVariants}
+          custom={isMegaMenuOpen}
+          transition={dynamicTransition}
+        >
+          <div className="flex h-14 w-full items-center justify-between px-2">
+            <Link href="/" className="flex items-center gap-2" onClick={() => isMegaMenuOpen && toggleMegaMenu()}>
+              <motion.div layout="position">
+                <Image
+                  src="/images/juju-logo.webp"
+                  alt="La grotte de Juju"
+                  width={40}
+                  height={40}
+                  className="rounded-full"
+                  priority
+                />
+              </motion.div>
             </Link>
+            {/* Increase ml from 4 to 8 for more spacing */}
+            <HeaderButton
+              variant="ghost"
+              className={`${styles.headerButtonCapsule} header-btn px-3 ml-8`}
+              onClick={toggleMegaMenu}
+              aria-label={isMegaMenuOpen ? "Fermer le menu" : "Ouvrir le menu"}
+              glowEffect={false}
+            >
+              <AnimatePresence initial={false} mode="wait">
+                <motion.div
+                  key={isMegaMenuOpen ? "x" : "grid"}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  {isMegaMenuOpen ? (
+                    <X className="h-5 w-5 text-gray-800" />
+                  ) : (
+                    <div className="flex items-center text-gray-700">
+                      <LayoutGrid className="h-5 w-5 mr-1.5" />
+                      <span className="text-sm font-medium">Menu</span>
+                    </div>
+                  )}
+                </motion.div>
+              </AnimatePresence>
+            </HeaderButton>
           </div>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-6">
-            {menuItems.map((item, index) => (
-              <div
-                key={item.title}
-                className="relative"
-                onMouseEnter={() => setActiveMenu(item.title)}
-                onMouseLeave={() => setActiveMenu(null)}
+          <AnimatePresence mode="wait">
+            {isMegaMenuOpen && (
+              <motion.div
+                className={styles.megaMenuContent}
+                initial="closed"
+                animate="open"
+                exit="closed"
+                variants={contentVariants}
               >
-                <motion.div
-                  whileHover="hover"
-                  whileTap="tap"
-                  variants={menuItemVariants}
-                >
-                  <Button 
-                    variant="ghost" 
-                    className={`font-medium ${styles.headerButton}`}
-                  >
-                    <span className="relative z-10">{item.title}</span>
-                  </Button>
-                </motion.div>
-                
-                {activeMenu === item.title && (
-                  <motion.div 
-                    className="absolute left-0 top-full w-48 py-2 bg-background rounded-md shadow-md z-50"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ type: "spring", stiffness: 300 }}
-                  >
-                    {item.submenu.map((subItem, idx) => (
-                      <motion.div
-                        key={subItem.title} 
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: idx * 0.05 }}
-                      >
-                        <Link
-                          href={subItem.href}
-                          className="block px-4 py-2 hover:bg-accent hover:text-accent-foreground"
-                        >
-                          {subItem.title}
-                        </Link>
-                      </motion.div>
-                    ))}
-                  </motion.div>
-                )}
-              </div>
-            ))}
-          </nav>
-
-          {/* Mobile Navigation */}
-          <Sheet>
-            <SheetTrigger asChild className="md:hidden">
-              <Button variant="ghost" size="icon" className={styles.headerButton}>
-                <Menu className="h-5 w-5" />
-                <span className="sr-only">Toggle menu</span>
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="right" className="w-[300px] sm:w-[400px]">
-              <nav className="flex flex-col gap-4 mt-8">
-                {menuItems.map((item, index) => (
-                  <div key={item.title} className="space-y-2">
-                    <Button
-                      variant="ghost"
-                      className={`w-full justify-start font-medium text-lg ${styles.headerButton}`}
-                      onClick={() => toggleMenu(item.title)}
-                    >
-                      {item.title}
-                    </Button>
-                    
-                    {activeMenu === item.title && (
+                <div className={styles.megaMenuGrid}>
+                  {menuItems.map((item) => {
+                    const Icon = item.icon;
+                    return (
                       <motion.div 
-                        className="ml-4 flex flex-col gap-1"
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: "auto" }}
-                        transition={{ duration: 0.3 }}
+                        key={item.title} 
+                        className={styles.megaMenuColumn}
+                        variants={itemVariants}
                       >
-                        {item.submenu.map((subItem, idx) => (
+                        <h3 className={styles.megaMenuTitle}>
+                          <Icon className="h-5 w-5 mr-2 text-primary" />
+                          {item.title}
+                        </h3>
+                        {item.submenu && item.submenu.map((subItem) => (
                           <motion.div
                             key={subItem.title}
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: idx * 0.1 }}
+                            variants={itemVariants}
                           >
                             <Link
                               href={subItem.href}
-                              className="py-2 px-4 hover:bg-accent hover:text-accent-foreground rounded-md block"
+                              className={`${styles.megaMenuLink} group`}
+                              onClick={toggleMegaMenu}
                             >
                               {subItem.title}
+                              <ChevronRight className="h-4 w-4 ml-auto opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
                             </Link>
                           </motion.div>
                         ))}
+                        {!item.submenu && item.href && (
+                          <motion.div variants={itemVariants}>
+                            <Link
+                              href={item.href}
+                              className={`${styles.megaMenuLink} group`}
+                              onClick={toggleMegaMenu}
+                            >
+                              {item.title}
+                            </Link>
+                          </motion.div>
+                        )}
                       </motion.div>
-                    )}
-                  </div>
-                ))}
-              </nav>
-            </SheetContent>
-          </Sheet>
-        </div>
+                    );
+                  })}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.div>
       </header>
     </>
   );

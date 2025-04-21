@@ -47,7 +47,6 @@ export default function LoadingScreen() {
           className="rounded-full"
         />
       </div>
-      <p className="loading-text">Chargement en cours...</p>
     </div>
   );
 }

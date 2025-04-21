@@ -39,11 +39,11 @@ export function HeroSection() {
           
           <AnimateOnScroll animation="scale" delay={0.6}>
             <div className="flex items-center justify-center lg:justify-end">
-              <div className="relative w-full max-w-[366px] h-[450px] overflow-hidden rounded-xl">
+              <div className="relative w-full max-w-[366px] h-[450px] rounded-xl">
                 <Image
                   src="images/Juju.webp"
                   alt="Personnage de Juju"
-                  className="absolute inset-0 object-cover w-full h-full hero-image shine-effect"
+                  className="absolute inset-0 object-contain w-full h-full shine-effect rounded-xl"
                   width={366}
                   height={450}
                   priority

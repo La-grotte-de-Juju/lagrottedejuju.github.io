@@ -67,13 +67,11 @@
     width: 100%;
     height: 100%;
     display: flex;
-    flex-direction: column;
+    flex-direction: column; /* Gardé pour aligner le gif */
     justify-content: center;
     align-items: center;
-    background-color: rgba(255, 255, 255, 0.6);  /* Fond semi-transparent */
-    backdrop-filter: blur(8px);  /* Effet de flou */
-    -webkit-backdrop-filter: blur(8px);  /* Pour Safari */
-    z-index: 99999; /* Plus haut que tous les autres éléments */
+    background-color: #ffffff; /* Fond blanc uni */
+    z-index: 99999;
     transition: opacity 0.7s ease-out, visibility 0.7s ease-out;
   }
 
@@ -83,24 +81,14 @@
   }
 
   .loading-gif {
-    width: 150px;
-    height: 150px;
-    margin-bottom: 1.5rem;
-    display: flex;
+    width: 150px; /* Ajusté si nécessaire */
+    height: 150px; /* Ajusté si nécessaire */
+    /* Suppression margin-bottom, padding */
+    display: flex; /* Gardé pour le centrage interne si l'Image le nécessite */
     justify-content: center;
     align-items: center;
-    border-radius: 0%;
-    padding: 1rem;
   }
 
-  .loading-screen {
-    background-color: #e1f3ff13;  /* Moved the background color here to apply to the entire page */
-  }
-
-  .loading-text {
-    font-size: 1.75rem;
-    color: rgb(0, 0, 0);
-  }
 }
 
 @layer base {

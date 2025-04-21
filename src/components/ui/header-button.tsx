@@ -28,20 +28,17 @@ const HeaderButton = React.forwardRef<HTMLButtonElement, HeaderButtonProps>(
           transition: { duration: 0.2 } 
         }}
         whileTap={{ scale: 0.98 }}
-        style={{ display: "inline-block" }}
       >
         <Button
           ref={ref}
           variant={variant}
           className={cn(
             "relative overflow-hidden",
-            glowEffect && "hover:shadow-[0_0_10px_2px_hsla(var(--primary),0.3)] hover:shadow-primary/30",
             className
           )}
           {...props}
         >
-          <span className="relative z-10">{children}</span>
-          <span className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></span>
+          {children}
         </Button>
       </motion.div>
     )
