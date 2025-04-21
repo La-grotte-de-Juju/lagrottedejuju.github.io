@@ -10,7 +10,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import styles from './header.module.css';
 import { usePathname } from 'next/navigation';
 // Version du site
-const SITE_VERSION = "testchannel-verbêta-1.0"; // La version actuelle du site
+const SITE_VERSION = "testchannel-verbêta-1.0.1"; // La version actuelle du site
 const DEV_TITLE = "Site en Développement";
 const DEV_MESSAGE = "Certaines fonctionnalités peuvent ne pas être disponibles.";
 const DEV_IMAGE = "/images/dev%20img/indev.webp"; // Chemin vers l'image de développement

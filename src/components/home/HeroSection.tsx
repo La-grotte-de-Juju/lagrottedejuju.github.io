@@ -23,12 +23,12 @@ export function HeroSection() {
                 <br></br>
               </div>
               <div className="flex flex-col gap-2 min-[400px]:flex-row">
-                <Link href="/series/batlife" prefetch={false}>
+                <Link href="https://www.youtube.com/@lagrottedejuju" prefetch={false}>
                   <Button size="lg" className="btn-primary-shine">
                     Voir sur YouTube
                   </Button>
                 </Link>
-                <Link href="https://youtube.com" target="_blank" rel="noopener noreferrer">
+                <Link href="https://www.youtube.com/@lagrottedejuju" target="_blank" rel="noopener noreferrer">
                   <Button size="lg" variant="outline" className="btn-outline-animate">
                     Découvrir Batlife
                   </Button>
@@ -41,8 +41,8 @@ export function HeroSection() {
             <div className="flex items-center justify-center lg:justify-end">
               <div className="relative w-full max-w-[366px] h-[450px] overflow-hidden rounded-xl">
                 <Image
-                  src="/images/juju.webp"
-                  alt="Personnage de Batlife"
+                  src="images/Juju.webp"
+                  alt="Personnage de Juju"
                   className="absolute inset-0 object-cover w-full h-full hero-image shine-effect"
                   width={366}
                   height={450}
