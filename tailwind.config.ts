@@ -49,7 +49,11 @@ export default {
   				'3': 'hsl(var(--chart-3))',
   				'4': 'hsl(var(--chart-4))',
   				'5': 'hsl(var(--chart-5))'
-  			}
+  			},
+        'apple-blue': '#64ceff',
+        'apple-purple': '#a779ff',
+        'apple-pink': '#ff85f1',
+        'apple-orange': '#ffca79',
   		},
   		fontFamily: {
       'titan-one': ['"Titan One"', 'cursive'],
@@ -125,6 +129,10 @@ export default {
           '0%': { transform: 'rotate(-5deg) scale(0.9)', opacity: '0' },
           '100%': { transform: 'rotate(0) scale(1)', opacity: '1' },
         },
+        'apple-gradient-shift': {
+          '0%, 100%': { 'background-position': '0% 50%' },
+          '50%': { 'background-position': '100% 50%' },
+        },
   		},
   		animation: {
   			'accordion-down': 'accordion-down 0.2s ease-out',
@@ -137,7 +145,12 @@ export default {
         'slide-right': 'slide-right 0.5s ease-out forwards',
         'scale-in': 'scale-in 0.5s ease-out forwards',
         'rotate-in': 'rotate-in 0.5s ease-out forwards',
-  		}
+        'apple-gradient': 'apple-gradient-shift 6s ease infinite',
+  		},
+      backgroundImage: {
+        'hero-pattern': "url('/images/headerfullresV1.webp')",
+        'apple-gradient': 'linear-gradient(90deg, var(--tw-gradient-stops))',
+      },
   	}
   },
   plugins: [

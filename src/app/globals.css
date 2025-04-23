@@ -31,6 +31,10 @@
     --chart-5: 27 87% 67%;
     --primary-rgb: 247, 172, 254;  /* Correspond à hsl(288 91% 83%) */
   }
+
+  html {
+    scroll-behavior: smooth;
+  }
   
   .dark {
     --background: 20 14.3% 4.1%;
@@ -70,7 +74,7 @@
     flex-direction: column; /* Gardé pour aligner le gif */
     justify-content: center;
     align-items: center;
-    background-color: #ffffff; /* Fond blanc uni */
+    background-color: #000000; /* Fond blanc uni */
     z-index: 99999;
     transition: opacity 0.7s ease-out, visibility 0.7s ease-out;
   }
@@ -446,4 +450,14 @@ nav [class*="btn"]:hover {
 .btn-card-premium:hover:after {
   opacity: 1;
   animation: subtle-shimmer 1.5s infinite;
+}
+
+@layer utilities {
+  .text-glow-primary {
+    /* Utilise la variable --primary définie dans :root */
+    text-shadow: 0 0 5px hsl(var(--primary) / 0.7),
+                 0 0 10px hsl(var(--primary) / 0.5),
+                 0 0 20px hsl(var(--primary) / 0.3),
+                 0 0 40px hsl(var(--primary) / 0.2);
+  }
 }

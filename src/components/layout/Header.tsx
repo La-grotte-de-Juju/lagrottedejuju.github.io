@@ -6,13 +6,13 @@ import Image from "next/image";
 import { HeaderButton } from "@/components/ui/header-button";
 import { 
   Menu, X, AlertTriangle, Bug, LayoutGrid, 
-  Brush, BookOpen, Clapperboard, Youtube, ChevronRight, Home
+  Brush, BookOpen, Clapperboard, Youtube, ChevronRight, Home, ChevronDown
 } from "lucide-react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import styles from './header.module.css';
 import { usePathname } from 'next/navigation';
 
-const SITE_VERSION = "testchannel-verbêta-1.1.0";
+const SITE_VERSION = "testchannel-verbêta-1.2.0";
 const DEV_TITLE = "Site en Développement";
 const DEV_MESSAGE = "Certaines fonctionnalités peuvent ne pas être disponibles.";
 const DEV_IMAGE = "/images/dev%20img/indev.webp";
@@ -60,7 +60,7 @@ const capsuleSpringTransition = {
   damping: 35,
 };
 
-// Variants for the main capsule animation
+// Amélioration des variants pour le style Dynamic Island
 const capsuleVariants = {
   hidden: { 
     y: -100, 
@@ -69,7 +69,9 @@ const capsuleVariants = {
   visible: (isMegaMenuOpen: boolean) => ({
     y: 0,
     opacity: 1,
-    borderRadius: isMegaMenuOpen ? "1.5rem" : "9999px",
+    width: isMegaMenuOpen ? "auto" : "auto",
+    height: isMegaMenuOpen ? "auto" : "56px",
+    borderRadius: isMegaMenuOpen ? "1.5rem" : "28px",
     backgroundColor: isMegaMenuOpen ? "hsla(0, 0%, 98%, 0.9)" : "hsla(0, 0%, 100%, 0.8)", 
     backdropFilter: isMegaMenuOpen ? "blur(18px) saturate(180%)" : "blur(16px) saturate(180%)",
     boxShadow: isMegaMenuOpen 
@@ -77,11 +79,78 @@ const capsuleVariants = {
       : "0 4px 15px -3px hsla(0, 0%, 0%, 0.1), 0 2px 6px -4px hsla(0, 0%, 0%, 0.1)",
     border: isMegaMenuOpen ? "1px solid hsla(0, 0%, 0%, 0.08)" : "1px solid hsla(0, 0%, 0%, 0.05)",
     transition: {
-      y: { type: 'spring', stiffness: 120, damping: 20, delay: 0.5 },
-      opacity: { duration: 0.3, delay: 0.5 },
-      default: { duration: 0 }
+      y: { type: 'spring', stiffness: 100, damping: 25, delay: 0.5 }, // Ralenti et adouci l'entrée
+      opacity: { duration: 0.5, delay: 0.5 }, // Fondu plus lent
+      width: { type: 'spring', stiffness: 300, damping: 35 }, // Redimensionnement plus lent et doux
+      height: { type: 'spring', stiffness: 300, damping: 35 }, // Redimensionnement plus lent et doux
+      borderRadius: { type: 'spring', stiffness: 300, damping: 35 }, // Changement de forme plus lent et doux
+      default: { duration: 0.5 } // Transition par défaut plus lente
     }
   }),
+};
+
+// Animation pour le bouton de défilement séparé
+const scrollButtonVariants = {
+  hidden: { 
+    opacity: 0, 
+    scale: 0.1, // Commence très petit
+    y: -5,      // Légère translation pour l'effet
+    originX: 0.5, // Point d'origine pour le scale
+    originY: 0.5
+  },
+  visible: { 
+    opacity: 1, 
+    scale: 1,
+    y: 0,
+    transition: {
+      type: 'spring',
+      stiffness: 400,
+      damping: 25,
+      delay: 0.7
+    }
+  },
+  hover: {
+    scale: 1.07, // Légèrement plus subtil que 1.1
+    transition: {
+      type: 'spring',
+      stiffness: 400,
+      damping: 20
+    }
+  },
+  exit: { // Animation de sortie améliorée pour se réduire
+    opacity: 0,
+    scale: 0.1, // Réduit à une petite taille
+    y: -5,      // Légère translation
+    transition: { duration: 0.2, ease: "easeIn" } // Transition rapide et nette
+  }
+};
+
+// Animation pour l'emplacement de future fonctionnalité
+const futureFunctionVariants = {
+  hidden: { 
+    opacity: 0, 
+    scale: 0.8,
+    x: 20 
+  },
+  visible: { 
+    opacity: 1, 
+    scale: 1,
+    x: 0,
+    transition: {
+      type: 'spring',
+      stiffness: 400,
+      damping: 25,
+      delay: 0.3
+    }
+  },
+  hover: { // Ajout de l'effet hover
+    scale: 1.07,
+    transition: {
+      type: 'spring',
+      stiffness: 400,
+      damping: 20
+    }
+  }
 };
 
 // Modifier les variants pour synchroniser les animations
@@ -161,6 +230,7 @@ export function Header() {
   const [isMegaMenuOpen, setIsMegaMenuOpen] = useState(false);
   const [showDevCard, setShowDevCard] = useState(true);
   const [isClosing, setIsClosing] = useState(false);
+  const [showScrollArrow, setShowScrollArrow] = useState(true);
   const pathname = usePathname();
   const shouldReduceMotion = useReducedMotion();
 
@@ -169,6 +239,19 @@ export function Header() {
     setShowDevCard(true);
     setIsClosing(false);
   }, [pathname]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 100) {
+        setShowScrollArrow(false);
+      } else {
+        setShowScrollArrow(true);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const toggleMegaMenu = () => {
     setIsMegaMenuOpen(!isMegaMenuOpen);
@@ -261,9 +344,10 @@ export function Header() {
         )}
       </AnimatePresence>
 
-      <header className={`fixed top-4 left-1/2 -translate-x-1/2 z-[60] w-auto`}>
+      <header className="fixed top-4 left-1/2 -translate-x-1/2 z-[60] w-auto flex items-center justify-center">
+        {/* Navbar capsule principale - style Dynamic Island */}
         <motion.div
-          className={`container flex flex-col h-auto items-center justify-center ${styles.navbarCapsule}`}
+          className={`flex items-center justify-between ${styles.navbarCapsule} px-3`}
           layout
           initial="hidden"
           animate="visible"
@@ -271,9 +355,15 @@ export function Header() {
           custom={isMegaMenuOpen}
           transition={dynamicTransition}
         >
-          <div className="flex h-14 w-full items-center justify-between px-2">
-            <Link href="/" className="flex items-center gap-2" onClick={() => isMegaMenuOpen && toggleMegaMenu()}>
-              <motion.div layout="position">
+          <div className="flex h-14 items-center justify-between">
+            <Link href="/" className="flex items-center" onClick={() => isMegaMenuOpen && toggleMegaMenu()}>
+              <motion.div 
+                layout="position"
+                initial={{ scale: 0.9 }}
+                animate={{ scale: 1 }}
+                whileHover={{ scale: 1.05 }} // Ajout de l'effet hover ici
+                transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+              >
                 <Image
                   src="/images/juju-logo.webp"
                   alt="La grotte de Juju"
@@ -284,10 +374,10 @@ export function Header() {
                 />
               </motion.div>
             </Link>
-            {/* Increase ml from 4 to 8 for more spacing */}
+
             <HeaderButton
               variant="ghost"
-              className={`${styles.headerButtonCapsule} header-btn px-3 ml-8`}
+              className={`${styles.headerButtonCapsule} header-btn ml-4 px-3`}
               onClick={toggleMegaMenu}
               aria-label={isMegaMenuOpen ? "Fermer le menu" : "Ouvrir le menu"}
               glowEffect={false}
@@ -295,10 +385,12 @@ export function Header() {
               <AnimatePresence initial={false} mode="wait">
                 <motion.div
                   key={isMegaMenuOpen ? "x" : "grid"}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.2 }}
+                  layout
+                  initial={{ opacity: 0, scale: 0.1 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.1 }}
+                  transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                  style={{ originX: 0.5, originY: 0.5 }}
                 >
                   {isMegaMenuOpen ? (
                     <X className="h-5 w-5 text-gray-800" />
@@ -369,6 +461,46 @@ export function Header() {
             )}
           </AnimatePresence>
         </motion.div>
+
+        {/* Bouton de défilement séparé - maintenant à droite de la pillule */}
+        <AnimatePresence>
+          {showScrollArrow && !isMegaMenuOpen && (
+            <motion.div 
+              className="ml-2 relative"
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              variants={scrollButtonVariants}
+              whileHover="hover"
+              onClick={() => window.scrollTo({ 
+                top: window.innerHeight, 
+                behavior: 'smooth'
+              })}
+            >
+              <div className="h-10 w-10 rounded-full bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl shadow-[0_2px_10px_rgba(0,0,0,0.1)] dark:shadow-[0_2px_10px_rgba(0,0,0,0.3)] border border-white/40 dark:border-gray-700/40 flex items-center justify-center cursor-pointer">
+                <ChevronDown className="h-5 w-5 text-primary/90" />
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Emplacement pour future fonctionnalité - apparaît seulement quand le mega menu est ouvert */}
+        <AnimatePresence>
+          {isMegaMenuOpen && (
+            <motion.div
+              className="ml-2 relative"
+              initial="hidden"
+              animate="visible"
+              exit={{ opacity: 0, scale: 0.8, x: 20, transition: { duration: 0.2 } }}
+              variants={futureFunctionVariants}
+              whileHover="hover"
+            >
+              <div className="h-10 w-10 rounded-full bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl shadow-[0_2px_10px_rgba(0,0,0,0.1)] dark:shadow-[0_2px_10px_rgba(0,0,0,0.3)] border border-white/40 dark:border-gray-700/40 flex items-center justify-center cursor-pointer opacity-50">
+                {/* Espace réservé pour une future fonctionnalité */}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </header>
     </>
   );

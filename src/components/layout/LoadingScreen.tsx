@@ -37,6 +37,19 @@ export default function LoadingScreen() {
 
   return (
     <div className={`loading-screen ${!isLoading ? 'hidden' : ''}`}>
+      {/* Couche d'effet de dégradé IA avec opacité améliorée */}
+      <div className="ai-gradient-effect"></div>
+      
+      {/* Ajout d'effets de lueur animés pour renforcer l'ambiance IA */}
+      <div className="ai-glow-orbs">
+        <div className="glow-orb glow-orb-1"></div>
+        <div className="glow-orb glow-orb-2"></div>
+        <div className="glow-orb glow-orb-3"></div>
+      </div>
+      
+      {/* Ajout d'un effet de scan IA */}
+      <div className="ai-scan-line"></div>
+      
       <div className="loading-gif">
         <Image 
           src="/images/JujuLoading512px.gif"
@@ -44,7 +57,7 @@ export default function LoadingScreen() {
           width={120}
           height={120}
           priority
-          className="rounded-full"
+          className="rounded-full z-20 relative" // Z-index augmenté pour être au-dessus des nouveaux effets
         />
       </div>
     </div>
