@@ -452,6 +452,30 @@ nav [class*="btn"]:hover {
   animation: subtle-shimmer 1.5s infinite;
 }
 
+/* Blur effect for page content when mobile menu is open */
+body.menu-open-blur > *:not(div[data-testid="navbar-container"]):not(#mobile-menu-container) {
+  filter: blur(8px);
+  transition: filter 0.3s ease-in-out;
+  /* Optional: Prevent interaction with blurred content */
+  /* pointer-events: none; */ 
+  /* user-select: none; */
+}
+
+/* Ensure the navbar container itself is NOT blurred */
+div[data-testid="navbar-container"] {
+  filter: none !important; 
+}
+
+/* Ensure the mobile menu container is NOT blurred */
+#mobile-menu-container {
+  filter: none !important;
+}
+
+/* Smooth transition when removing the blur */
+body > *:not(div[data-testid="navbar-container"]):not(#mobile-menu-container) {
+  transition: filter 0.3s ease-in-out;
+}
+
 @layer utilities {
   .text-glow-primary {
     /* Utilise la variable --primary définie dans :root */

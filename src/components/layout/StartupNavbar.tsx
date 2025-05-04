@@ -80,7 +80,7 @@ const StartupNavbar = () => {
   const navbarStyle: MotionStyle = {
     padding: `${0.2 + ((1 - scrollProgress) * 0.2)}rem ${1 + ((1 - scrollProgress) * 0.5)}rem`,
     borderRadius: `${(1 - scrollProgress) * 1}rem`,
-    width: `${scrollProgress * 100 + (1 - scrollProgress) * 70}%`,
+    width: `${scrollProgress * 100 + (1 - scrollProgress) * 50}%`, 
     maxWidth: scrollProgress > 0.9 ? '100%' : `${(1 - scrollProgress) * 48 + 36}rem`,
     backgroundColor: `rgba(255, 255, 255, ${0.70 + scrollProgress * 0.15})`,
     backdropFilter: `blur(${8 + scrollProgress * 4}px)`,
