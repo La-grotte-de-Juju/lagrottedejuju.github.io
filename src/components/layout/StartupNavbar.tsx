@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Link as LinkIcon, Menu, X, Plus } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, MotionStyle } from 'framer-motion';
 
 const StartupNavbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -77,7 +77,7 @@ const StartupNavbar = () => {
     paddingTop: `${Math.max(0, ((1 - scrollProgress) * 35))}px`,
   };
 
-  const navbarStyle = {
+  const navbarStyle: MotionStyle = {
     padding: `${0.2 + ((1 - scrollProgress) * 0.2)}rem ${1 + ((1 - scrollProgress) * 0.5)}rem`,
     borderRadius: `${(1 - scrollProgress) * 1}rem`,
     width: `${scrollProgress * 100 + (1 - scrollProgress) * 70}%`,
@@ -90,10 +90,10 @@ const StartupNavbar = () => {
       : '0 4px 12px rgba(0, 0, 0, 0.07), 0 2px 6px rgba(0, 0, 0, 0.04)',
     transformOrigin: 'top center',
     transform: `scale(${1 - ((1 - scrollProgress) * 0.02)})`,
-    position: 'relative',
+    position: 'relative' as const,
   };
 
-  const mobileMenuStyle = {
+  const mobileMenuStyle: MotionStyle = {
     borderRadius: '0.8rem',
     boxShadow: '0 8px 25px rgba(0, 0, 0, 0.15)',
     backgroundColor: 'rgba(255, 255, 255, 0.9)',
@@ -101,12 +101,12 @@ const StartupNavbar = () => {
     WebkitBackdropFilter: 'blur(12px)',
     border: '1px solid rgba(0, 0, 0, 0.06)',
     maxHeight: 'calc(80vh)',
-    overflowY: 'auto',
+    overflowY: 'auto' as const,
     maxWidth: '90vw',
     width: '350px',
   };
 
-  const overlayStyle = {
+  const overlayStyle: MotionStyle = {
     position: 'fixed' as const,
     top: 0,
     left: 0,
@@ -244,7 +244,7 @@ const StartupNavbar = () => {
           {isMenuOpen && (
             <>
               <div 
-                style={overlayStyle} 
+                style={overlayStyle as React.CSSProperties} 
                 onClick={toggleMenu}
                 aria-label="Fermer le menu"
               />
@@ -256,9 +256,9 @@ const StartupNavbar = () => {
                 className="fixed z-50" 
                 style={{
                   ...mobileMenuStyle,
-                  top: '50%', 
-                  left: '50%',
-                  transform: 'translate(-50%, -50%)'
+                  top: '50%' as const,
+                  left: '50%' as const,
+                  transform: 'translate(-50%, -50%)' as const
                 }}
               >
                 <motion.div 
