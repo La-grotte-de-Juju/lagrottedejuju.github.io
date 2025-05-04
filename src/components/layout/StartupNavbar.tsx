@@ -62,7 +62,7 @@ const StartupNavbar = () => {
 
   const menuItemVariants = {
     hidden: { opacity: 0, y: -5 },
-    visible: (i) => ({ 
+    visible: (i: number) => ({ 
       opacity: 1, 
       y: 0,
       transition: { 
