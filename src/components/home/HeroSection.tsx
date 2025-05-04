@@ -173,7 +173,7 @@ export function HeroSection() {
   };
 
   return (
-    <section className="relative flex items-center justify-center h-screen overflow-hidden bg-center bg-cover bg-hero-pattern">
+    <section className="relative flex items-center justify-center min-h-screen overflow-hidden bg-center bg-cover bg-hero-pattern">
       <motion.div 
         className="absolute inset-0 bg-black"
         initial="hidden"

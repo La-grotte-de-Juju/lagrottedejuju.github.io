@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useEffect, ReactNode } from "react";
-import { motion, useInView, useAnimation, Variant } from "framer-motion";
+import { motion, useInView, useAnimation } from "framer-motion";
 
 interface AnimateOnScrollProps {
   children: ReactNode;
@@ -13,115 +13,60 @@ interface AnimateOnScrollProps {
   once?: boolean;
 }
 
-// Améliorer les animations existantes et ajouter des versions 3D
+// Animations simplifiées avec des transitions ease-in-out plus légères
 const animations = {
   fade: {
-    hidden: { opacity: 0, filter: "blur(8px)" },
-    visible: { 
-      opacity: 1, 
-      filter: "blur(0px)",
-      transition: { type: "spring", damping: 12 }
-    },
+    hidden: { opacity: 0 },
+    visible: { opacity: 1 },
   },
   "slide-up": {
-    hidden: { y: 100, opacity: 0, filter: "blur(8px)" },
-    visible: { 
-      y: 0, 
-      opacity: 1, 
-      filter: "blur(0px)",
-      transition: { type: "spring", damping: 12, stiffness: 100 }
-    },
+    hidden: { y: 50, opacity: 0 },
+    visible: { y: 0, opacity: 1 },
   },
   "slide-down": {
-    hidden: { y: -100, opacity: 0, filter: "blur(8px)" },
-    visible: { 
-      y: 0, 
-      opacity: 1, 
-      filter: "blur(0px)",
-      transition: { type: "spring", damping: 12, stiffness: 100 }
-    },
+    hidden: { y: -50, opacity: 0 },
+    visible: { y: 0, opacity: 1 },
   },
   "slide-left": {
-    hidden: { x: 100, opacity: 0, filter: "blur(8px)" },
-    visible: { 
-      x: 0, 
-      opacity: 1, 
-      filter: "blur(0px)",
-      transition: { type: "spring", damping: 12, stiffness: 100 }
-    },
+    hidden: { x: 50, opacity: 0 },
+    visible: { x: 0, opacity: 1 },
   },
   "slide-right": {
-    hidden: { x: -100, opacity: 0, filter: "blur(8px)" },
-    visible: { 
-      x: 0, 
-      opacity: 1, 
-      filter: "blur(0px)",
-      transition: { type: "spring", damping: 12, stiffness: 100 }
-    },
+    hidden: { x: -50, opacity: 0 },
+    visible: { x: 0, opacity: 1 },
   },
   scale: {
-    hidden: { scale: 0.8, opacity: 0, filter: "blur(8px)" },
-    visible: { 
-      scale: 1, 
-      opacity: 1, 
-      filter: "blur(0px)",
-      transition: { type: "spring", bounce: 0.4, duration: 0.8 }
-    },
+    hidden: { scale: 0.9, opacity: 0 },
+    visible: { scale: 1, opacity: 1 },
   },
   rotate: {
-    hidden: { rotate: -5, scale: 0.9, opacity: 0, filter: "blur(8px)" },
-    visible: { 
-      rotate: 0, 
-      scale: 1, 
-      opacity: 1, 
-      filter: "blur(0px)",
-      transition: { type: "spring", bounce: 0.4, duration: 0.8 }
-    },
+    hidden: { rotate: -5, scale: 0.95, opacity: 0 },
+    visible: { rotate: 0, scale: 1, opacity: 1 },
   },
   "card-3d": {
     hidden: { 
       opacity: 0, 
-      scale: 0.9,
-      rotateX: 25, 
-      rotateY: -15,
-      z: -100,
-      filter: "blur(8px)"
+      scale: 0.95,
+      rotateX: 10, 
+      rotateY: -5,
     },
     visible: { 
       opacity: 1, 
       scale: 1,
       rotateX: 0, 
       rotateY: 0,
-      z: 0,
-      filter: "blur(0px)",
-      transition: { 
-        type: "spring", 
-        damping: 10, 
-        stiffness: 80, 
-        bounce: 0.25,
-        duration: 0.8
-      }
     },
   },
   "bounce-3d": {
     hidden: { 
-      y: 100, 
+      y: 30, 
       opacity: 0, 
-      rotateX: 10,
-      perspective: 1000,
-      filter: "blur(8px)"
+      rotateX: 5,
     },
     visible: { 
       y: 0, 
       opacity: 1, 
       rotateX: 0,
-      perspective: 1000, 
-      filter: "blur(0px)",
-      transition: { 
-        type: "spring", 
-        bounce: 0.5, 
-        duration: 1 
-      }
     },
   },
 };
@@ -133,19 +78,19 @@ export default function AnimateOnScroll({
   delay = 0,
   threshold = 0.1,
   className = "",
-  once = false, // Changé de true à false pour que les animations se rejouent
+  once = false,
 }: AnimateOnScrollProps) {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: false, amount: threshold }); // Force once à false pour que l'événement se déclenche à chaque fois
+  const isInView = useInView(ref, { once, amount: threshold });
   const controls = useAnimation();
 
   useEffect(() => {
     if (isInView) {
       controls.start("visible");
-    } else {
-      controls.start("hidden"); // Réinitialise l'animation quand l'élément n'est plus visible
+    } else if (!once) {
+      controls.start("hidden");
     }
-  }, [isInView, controls]);
+  }, [isInView, controls, once]);
 
   const selectedAnimation = animations[animation] || animations.fade;
 
@@ -156,14 +101,15 @@ export default function AnimateOnScroll({
       animate={controls}
       variants={selectedAnimation}
       transition={{ 
-        duration: duration, 
-        delay: delay,
-        ease: "easeOut"
+        duration, 
+        delay,
+        ease: "easeInOut"  // Animation simplifiée avec une courbe ease-in-out standard
       }}
-      style={{ 
-        perspective: "1000px", 
-        transformStyle: "preserve-3d"
-      }}
+      style={
+        animation === "card-3d" || animation === "bounce-3d" 
+          ? { perspective: "1000px", transformStyle: "preserve-3d" } 
+          : undefined
+      }
       className={className}
     >
       {children}

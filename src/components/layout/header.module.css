@@ -1,34 +1,59 @@
 /* New styles for the capsule navbar */
 .navbarCapsule {
-  /* Utiliser un fond clair semi-transparent avec flou */
-  background-color: hsla(0, 0%, 100%, 0.8); /* Blanc semi-transparent */
+  /* Static styles for the closed state */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  /* Removed overflow:hidden */
+  max-width: 95vw;
+  width: auto; /* Default width */
+  height: 56px; /* Default height */
+  border-radius: 28px; /* Default border radius */
+  background-color: hsla(0, 0%, 100%, 0.85);
   backdrop-filter: blur(16px) saturate(180%);
   -webkit-backdrop-filter: blur(16px) saturate(180%);
-  border-radius: 9999px; /* Fully rounded pill shape - Initial state */
-  padding: 0.15rem 0.5rem; 
-  border: 1px solid hsla(0, 0%, 0%, 0.05); /* Bordure sombre très subtile */
-  box-shadow: 0 4px 15px -3px hsla(0, 0%, 0%, 0.1), 0 2px 6px -4px hsla(0, 0%, 0%, 0.1); /* Ombre adaptée pour fond clair */
-  display: inline-flex;
-  flex-direction: column;
-  max-width: 95vw; 
-  min-width: 150px; 
-  min-height: 1rem; 
+  border: 1px solid hsla(0, 0%, 0%, 0.05);
+  box-shadow: 0 4px 15px -3px hsla(0, 0%, 0%, 0.1), 0 2px 6px -4px hsla(0, 0%, 0%, 0.1);
+  padding: 0; /* Remove padding, handled by inner div */
+  transition: width 0.3s ease, height 0.3s ease, border-radius 0.3s ease, background-color 0.3s ease, backdrop-filter 0.3s ease, box-shadow 0.3s ease; /* Add basic CSS transitions */
+}
+
+/* Styles for the open state */
+.navbarCapsuleOpen {
+  width: clamp(300px, 90vw, 600px);
+  height: auto; /* Auto height for content */
+  border-radius: 24px;
+  background-color: hsla(0, 0%, 98%, 0.95);
+  backdrop-filter: blur(20px) saturate(190%);
+  -webkit-backdrop-filter: blur(20px) saturate(190%);
+  border: 1px solid hsla(0, 0%, 0%, 0.1);
+  box-shadow: 0 12px 30px -8px hsla(0, 0%, 0%, 0.2), 0 8px 15px -10px hsla(0, 0%, 0%, 0.15);
+}
+
+/* Ensure the top part (logo + menu button) doesn't shrink */
+.navbarCapsule > div:first-child {
+  flex-shrink: 0;
 }
 
 /* Adjusted styles for buttons inside the capsule */
 .headerButtonCapsule {
-  color: hsl(var(--foreground)); /* Utiliser la couleur de texte par défaut (sombre) */
-  padding: 0.5rem; 
+  color: hsl(var(--foreground));
+  padding: 0.5rem;
   border-radius: 9999px;
-  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
-  height: 2.5rem;
+  transition: background-color 0.2s ease-in-out, transform 0.2s ease-in-out; /* Added transform transition */
+  height: 2.5rem; /* 40px */
+  width: auto; /* Adjust width based on content */
+  min-width: 2.5rem; /* Ensure minimum width for icon-only state */
   display: flex;
   align-items: center;
   justify-content: center;
+  background-color: transparent; /* Start transparent */
 }
 
 .headerButtonCapsule:hover {
-  background-color: hsla(var(--foreground), 0.05); /* Léger fond au survol */
+  background-color: hsla(var(--foreground), 0.08); /* Slightly stronger hover */
+  transform: scale(1.05); /* Add scale on hover */
 }
 
 .headerButtonCapsule:focus-visible {
@@ -40,118 +65,153 @@
 .megaMenuBackdrop {
   position: fixed;
   inset: 0;
-  background-color: hsla(0, 0%, 0%, 0.1); /* Fond plus clair pour le backdrop */
-  z-index: 55;
-  -webkit-backdrop-filter: blur(8px); /* Flou légèrement réduit */
-  backdrop-filter: blur(8px);
+  background-color: hsla(0, 0%, 0%, 0.15); /* Slightly darker backdrop */
+  z-index: 55; /* Below header capsule (z-60) */
+  -webkit-backdrop-filter: blur(10px); /* Slightly more blur */
+  backdrop-filter: blur(10px);
+  /* Basic fade transition */
+  opacity: 1;
+  transition: opacity 0.3s ease-in-out;
 }
 
 /* Mega Menu Content Area */
 .megaMenuContent {
   width: 100%;
-  transform-origin: top;
-  padding: 1.5rem; 
-  margin-top: 0.5rem; 
-  /* Le fond est défini dynamiquement dans Header.tsx */
-  overscroll-behavior: contain; /* Prevent body scroll when menu is scrolled */
+  padding: 1.5rem 2rem; /* Added top padding, increased side padding */
+  box-sizing: border-box;
 }
 
-/* New styles for the improved Mega Menu */
+/* Mega Menu Grid */
 .megaMenuGrid {
-  display: grid;
-  grid-template-columns: repeat(1, 1fr);
-  gap: 2rem; /* Increased gap */
+  display: flex; /* Changed to flexbox */
+  justify-content: space-around; /* Distribute columns */
+  gap: 2rem; /* Gap between columns */
+  width: 100%;
+  flex-wrap: wrap; /* Allow wrapping on smaller screens */
 }
 
 /* Mobile specific adjustments */
 @media (max-width: 767px) {
+  .navbarCapsule {
+    padding: 0.5rem;
+    height: auto;
+  }
+
+  .headerButtonCapsule {
+    margin: 0 0.15rem;
+    padding: 0.5rem 0.6rem;
+    min-height: 42px; /* Ensure minimum touch target size */
+  }
+
+  .megaMenuBackdrop {
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+  }
+
   .megaMenuContent {
-    padding: 1rem; /* Reduced padding for mobile */
-    position: fixed; /* Position fixed to viewport */
-    /* Use inset for positioning */
-    inset: 60px 0 0 0; /* top: 60px, left: 0, right: 0, bottom: 0 */
-    height: calc(100vh - 60px); /* Explicitly set height */
-    width: 100vw; /* Explicitly set width */
-    margin-top: 0; /* Reset margin */
-    border-radius: 0; /* Remove border radius for full screen */
-    overflow-y: auto; /* Enable vertical scroll */
-    background-color: hsl(var(--background)); /* Ensure background is set */
-    z-index: 60; /* Ensure content is above backdrop */
-    /* Reset transform origin if it causes issues with fixed positioning */
-    transform-origin: center center;
+    padding: 0.75rem 0.5rem;
+    max-height: 75vh; /* Limit height on mobile */
+    overflow-y: auto; /* Allow scrolling for tall menus */
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
   }
+
   .megaMenuGrid {
-    gap: 1rem; /* Reduced gap for mobile */
-    /* Ensure grid takes full width */
+    justify-content: flex-start;
+    gap: 0.75rem;
+    flex-direction: column; /* Stack columns on mobile */
+  }
+
+  .megaMenuColumn {
     width: 100%;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid hsla(var(--border), 0.1);
   }
+
+  .megaMenuColumn:last-child {
+    border-bottom: none;
+  }
+
   .megaMenuTitle {
-     font-size: 0.95rem; /* Slightly smaller title on mobile */
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
   }
+
   .megaMenuLink {
-    padding: 0.5rem 0.75rem; /* Reduced padding for links on mobile */
-    font-size: 0.85rem; /* Slightly smaller link text on mobile */
+    padding: 0.5rem 0;
+    font-size: 0.9rem;
+    display: block; /* Make full width for easier tapping */
+  }
+  
+  .megaMenuLink:active {
+    transform: scale(0.98); /* Subtle feedback on tap */
   }
 }
 
-@media (min-width: 768px) { /* md breakpoint */
+/* Enhanced mobile touch interactions */
+@media (max-width: 480px) {
+  .headerButtonCapsule {
+    padding: 0.5rem;
+    margin: 0 0.1rem;
+  }
+
+  .navbarCapsuleOpen {
+    height: auto;
+  }
+
+  /* Better spacing for dropdown content on small screens */
+  .megaMenuContent {
+    padding-bottom: 2rem; /* Extra padding at bottom for scrolling comfort */
+  }
+
+  /* Make column titles more visible */
+  .megaMenuTitle {
+    color: hsl(var(--primary));
+  }
+}
+
+/* Tablet and Desktop adjustments */
+@media (min-width: 768px) {
   .megaMenuGrid {
-    grid-template-columns: repeat(2, 1fr);
+     gap: 3rem; /* Increase gap for tablets */
   }
 }
 
 @media (min-width: 1024px) { /* lg breakpoint */
   .megaMenuGrid {
-    /* Change to horizontal flow */
-    grid-auto-flow: column; 
-    grid-auto-columns: max-content; /* Adjust column width based on content */
-    justify-content: center; /* Center the items horizontally */
-    gap: 5rem; /* Further increased gap between columns */
+    justify-content: center; /* Center columns on larger screens */
+    gap: 4rem; /* Further increased gap between columns */
+    flex-wrap: nowrap; /* Prevent wrapping on large screens */
   }
 }
 
 .megaMenuColumn {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem; 
+  gap: 0.5rem; /* Reduced gap between title and links */
 }
 
 .megaMenuTitle {
   display: flex;
   align-items: center;
-  font-weight: 600; 
-  font-size: 1rem; 
-  margin-bottom: 0.5rem; 
-  color: hsl(var(--foreground)); /* Couleur de texte sombre pour les titres */
-  white-space: nowrap; 
+  font-weight: 600;
+  font-size: 1rem;
+  margin-bottom: 0.75rem; /* Space below title */
+  color: hsl(var(--foreground));
+  white-space: nowrap;
 }
 
 .megaMenuLink {
-  display: flex; 
-  align-items: center; 
-  padding: 0.6rem 0.8rem; 
-  border-radius: 0.5rem; 
-  font-size: 0.9rem; 
-  color: hsl(var(--muted-foreground)); /* Couleur de texte sombre mais atténuée */
-  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out; 
-  position: relative; 
-  overflow: hidden; 
+  display: block; /* Changed from flex */
+  padding: 0.25rem 0; /* Simplified padding */
+  border-radius: 0.25rem; /* Slightly less rounded */
+  font-size: 0.95rem; /* Adjusted font size */
+  color: hsl(var(--muted-foreground));
+  transition: color 0.15s ease-in-out;
+  /* Removed position relative and overflow hidden */
 }
 
 .megaMenuLink:hover {
-  color: hsl(var(--foreground)); /* Couleur de texte sombre standard au survol */
-  background-color: hsla(var(--foreground), 0.05); /* Léger fond au survol */
-}
-
-/* Keep mobile styles if still relevant (maybe for links inside mega menu?) */
-.mobileButton {
-  width: 100%;
-  text-align: left;
-  justify-content: flex-start;
-  border-radius: 0.375rem;
-  padding: 0.625rem 1rem;
-}
-
-.mobileButton:hover {
-  background-color: hsla(var(--primary), 0.1);
+  color: hsl(var(--primary)); /* Changed hover color to primary */
+  /* Removed background-color on hover */
 }

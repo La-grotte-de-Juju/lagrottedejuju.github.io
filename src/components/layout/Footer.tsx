@@ -45,7 +45,6 @@ export function Footer() {
     <footer className="border-t bg-background/80 backdrop-blur-sm">
       <div className="container py-10">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8">
-          {/* Logo and Social Links */}
           <div className="lg:col-span-1">
             <Link href="/" className="flex items-center gap-2 mb-4">
               <Image
@@ -76,7 +75,6 @@ export function Footer() {
             </div>
           </div>
 
-          {/* Menu Groups */}
           {menuGroups.map((group) => (
             <div key={group.title} className="space-y-3">
               <h3 className="font-medium text-foreground">{group.title}</h3>

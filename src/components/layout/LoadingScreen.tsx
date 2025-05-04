@@ -7,28 +7,22 @@ export default function LoadingScreen() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Fonction qui vérifie si le document est complètement chargé
     const handleLoad = () => {
-      // Ajoute un délai pour voir l'animation de chargement un peu plus longtemps
       setTimeout(() => {
         setIsLoading(false);
-      }, 10); // Un peu plus long pour une meilleure expérience visuelle
+      }, 10);
     };
 
-    // Si la page est déjà chargée quand le composant monte
     if (document.readyState === 'complete') {
       handleLoad();
     } else {
-      // Sinon on attend l'événement load
       window.addEventListener('load', handleLoad);
     }
 
-    // Définir un timeout de secours au cas où l'événement load ne se déclenche pas
     const fallbackTimer = setTimeout(() => {
       setIsLoading(false);
-    }, 5000); // 5 secondes maximum de chargement
+    }, 5000);
 
-    // Nettoyage lors du démontage du composant
     return () => {
       window.removeEventListener('load', handleLoad);
       clearTimeout(fallbackTimer);
@@ -37,17 +31,14 @@ export default function LoadingScreen() {
 
   return (
     <div className={`loading-screen ${!isLoading ? 'hidden' : ''}`}>
-      {/* Couche d'effet de dégradé IA avec opacité améliorée */}
       <div className="ai-gradient-effect"></div>
       
-      {/* Ajout d'effets de lueur animés pour renforcer l'ambiance IA */}
       <div className="ai-glow-orbs">
         <div className="glow-orb glow-orb-1"></div>
         <div className="glow-orb glow-orb-2"></div>
         <div className="glow-orb glow-orb-3"></div>
       </div>
       
-      {/* Ajout d'un effet de scan IA */}
       <div className="ai-scan-line"></div>
       
       <div className="loading-gif">
@@ -57,7 +48,7 @@ export default function LoadingScreen() {
           width={120}
           height={120}
           priority
-          className="rounded-full z-20 relative" // Z-index augmenté pour être au-dessus des nouveaux effets
+          className="rounded-full z-20 relative"
         />
       </div>
     </div>
