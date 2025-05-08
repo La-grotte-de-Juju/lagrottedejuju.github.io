@@ -23,15 +23,15 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "La Grotte de Juju",
-  description: "Site officiel de La Grotte de Juju, YouTubeur d'animation et bandes dessinées.",
+  description: "Ici, tu pourras rester au courant des nouveautés de la chaîne, qu'il s'agisse des dernières vidéos, des créations en cours ou de l'univers qui prend forme peu à peu ! Tu auras même la chance de lire des bandes dessinées mettant en scène tes personnages préférés.",
   openGraph: {
     title: "La Grotte de Juju",
-    description: "Site officiel de La Grotte de Juju, YouTubeur d'animation et bandes dessinées.",
+    description: "Ici, tu pourras rester au courant des nouveautés de la chaîne, qu'il s'agisse des dernières vidéos, des créations en cours ou de l'univers qui prend forme peu à peu ! Tu auras même la chance de lire des bandes dessinées mettant en scène tes personnages préférés.",
     images: [
       {
-        url: "/images/og-image.jpg",
-        width: 1200,
-        height: 630,
+        url: "/images/headerfullresV1.webp", // Changed image
+        width: 1200, // Assuming original width, adjust if necessary
+        height: 630, // Assuming original height, adjust if necessary
         alt: "La Grotte de Juju",
       }
     ],
@@ -40,8 +40,8 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "La Grotte de Juju",
-    description: "Site officiel de La Grotte de Juju, YouTubeur d'animation et bandes dessinées.",
-    images: ["/images/og-image.jpg"],
+    description: "Ici, tu pourras rester au courant des nouveautés de la chaîne, qu'il s'agisse des dernières vidéos, des créations en cours ou de l'univers qui prend forme peu à peu ! Tu auras même la chance de lire des bandes dessinées mettant en scène tes personnages préférés.",
+    images: ["/images/headerfullresV1.webp"], // Changed image
   },
 };
 

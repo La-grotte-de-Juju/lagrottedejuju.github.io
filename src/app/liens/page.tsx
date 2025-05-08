@@ -61,7 +61,7 @@ type LinkWithColSpan = (typeof initialLinks)[number] & { colSpan: string };
 const LiensPage: React.FC = () => {
 	const [shuffledLinks, setShuffledLinks] = useState<LinkWithColSpan[]>(() => {
 		const desiredSpanClasses = [
-			'col-span-1 md:col-span-1', 'col-span-1 md:col-span-1', 'col-span-1 md:col-span-1', 
+			'col-span-1 md:col-span-1', 'col-span-1 md:col-span-1', 'col-span-1 md:col-span-1',
 			'col-span-1 md:col-span-2', 
 			'col-span-2 md:col-span-2', 'col-span-2 md:col-span-2'  
 		];
@@ -202,7 +202,7 @@ const LiensPage: React.FC = () => {
 					{' '}partout !
 				</h1>
 				<p className="mt-4 text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-					Tous les liens essentiels pour suivre les aventures de La Grotte de Juju et soutenir la création.
+				Tous ces liens m'appartiennent, mais je vous les partage !
 				</p>
 			</motion.div>
 
