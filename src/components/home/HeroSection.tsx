@@ -12,8 +12,10 @@ export function HeroSection() {
   const controls = useAnimation();
 
   useEffect(() => {
-    // Démarrer la séquence d'animation au chargement
-    controls.start("visible");
+    const timer = setTimeout(() => {
+      controls.start("visible");
+    }, 0);
+    return () => clearTimeout(timer);
   }, [controls]);
 
   const handlePlayClick = () => {
@@ -50,7 +52,7 @@ export function HeroSection() {
   };
 
   const titleVariants: Variants = {
-    hidden: { 
+    hidden: {
       opacity: 0,
       y: 30,
       scale: 0.9,
@@ -67,15 +69,15 @@ export function HeroSection() {
         stiffness: 100,
         mass: 1.2,
         delay: 0.2,
-      }
-    }
+      },
+    },
   };
 
   const brandNameVariants: Variants = {
-    hidden: { 
+    hidden: {
       opacity: 0,
       scale: 0.8,
-      filter: "blur(12px)"
+      filter: "blur(12px)",
     },
     visible: {
       opacity: 1,
@@ -83,20 +85,20 @@ export function HeroSection() {
       filter: "blur(0px)",
       transition: {
         type: "spring",
-        damping: 10, 
+        damping: 10,
         stiffness: 80,
         mass: 1.8,
         delay: 0.5,
-      }
-    }
+      },
+    },
   };
 
   const descriptionVariants: Variants = {
-    hidden: { 
+    hidden: {
       opacity: 0,
       y: 40,
       scale: 0.95,
-      filter: "blur(10px)"
+      filter: "blur(10px)",
     },
     visible: {
       opacity: 1,
@@ -108,16 +110,16 @@ export function HeroSection() {
         damping: 15,
         stiffness: 90,
         delay: 0.7,
-      }
-    }
+      },
+    },
   };
 
   const videoContainerVariants: Variants = {
-    hidden: { 
+    hidden: {
       opacity: 0,
       y: 50,
       scale: 0.92,
-      filter: "blur(20px)"
+      filter: "blur(20px)",
     },
     visible: {
       opacity: 1,
@@ -130,51 +132,51 @@ export function HeroSection() {
         stiffness: 70,
         mass: 1.5,
         delay: 0.9,
-      }
-    }
+      },
+    },
   };
 
   const playButtonVariants: Variants = {
     initial: { scale: 1 },
-    hover: { 
+    hover: {
       scale: 1.1,
       boxShadow: "0px 0px 20px rgba(255, 133, 241, 0.7)",
       transition: {
         type: "spring",
         stiffness: 400,
-        damping: 10
-      }
+        damping: 10,
+      },
     },
-    tap: { 
+    tap: {
       scale: 0.95,
       transition: {
         type: "spring",
         stiffness: 500,
-        damping: 15
-      }
-    }
+        damping: 15,
+      },
+    },
   };
 
   const backdropVariants: Variants = {
-    hidden: { 
-      opacity: 1,
+    hidden: {
+      opacity: 0,
       backdropFilter: "blur(20px)",
     },
     visible: {
-      opacity: 0.95, // Effet sombre en permanence
-      backdropFilter: "blur(20px)", // Flou intense en permanence
-      backgroundColor: "rgba(0, 0, 0, 0.85)", // Fond sombre en permanence
+      opacity: 0.95,
+      backdropFilter: "blur(20px)",
+      backgroundColor: "rgba(0, 0, 0, 0.85)",
       transition: {
         duration: 1.2,
         ease: "easeOut",
         delay: 0.1,
-      }
-    }
+      },
+    },
   };
 
   return (
     <section className="relative flex items-center justify-center min-h-screen overflow-hidden bg-center bg-cover bg-hero-pattern">
-      <motion.div 
+      <motion.div
         className="absolute inset-0 bg-black"
         initial="hidden"
         animate={controls}
@@ -189,26 +191,26 @@ export function HeroSection() {
         >
           <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none title-font mb-6">
             Bienvenue dans <br />
-            <motion.span 
+            <motion.span
               className="relative inline-block"
               variants={brandNameVariants}
               initial="hidden"
               animate={controls}
             >
               <span
-                className="absolute inset-0 blur-lg bg-apple-gradient from-apple-blue via-apple-purple via-apple-pink to-apple-orange bg-[length:200%_auto] bg-clip-text text-transparent animate-apple-gradient"
+                className="absolute inset-0 blur-lg bg-apple-gradient from-apple-blue via-apple-purple to-apple-orange bg-[length:200%_auto] bg-clip-text text-transparent animate-apple-gradient"
                 aria-hidden="true"
               >
                 La Grotte de Juju
               </span>
-              <span className="relative z-10 bg-apple-gradient from-apple-blue via-apple-purple via-apple-pink to-apple-orange bg-[length:200%_auto] bg-clip-text text-transparent animate-apple-gradient">
+              <span className="relative z-10 bg-apple-gradient from-apple-blue via-apple-purple to-apple-orange bg-[length:200%_auto] bg-clip-text text-transparent animate-apple-gradient">
                 La Grotte de Juju
               </span>
             </motion.span>
           </h1>
         </motion.div>
 
-        <motion.p 
+        <motion.p
           className="max-w-[700px] mx-auto text-base md:text-lg mb-8"
           initial="hidden"
           animate={controls}
@@ -217,13 +219,12 @@ export function HeroSection() {
           Ici, tu pourras rester au courant des nouveautés de la chaîne, qu'il s'agisse des dernières vidéos, des créations en cours ou de l'univers qui prend forme peu à peu ! Tu auras même la chance de lire des bandes dessinées mettant en scène tes personnages préférés.
         </motion.p>
 
-        <motion.div 
+        <motion.div
           className="w-full max-w-2xl mx-auto mt-8 rounded-3xl shadow-[0_35px_60px_-15px_rgba(0,0,0,0.3)] overflow-hidden border border-white/10 bg-white/10 backdrop-blur-xl"
           initial="hidden"
           animate={controls}
           variants={videoContainerVariants}
         >
-          {/* Barre de titre dans le style Apple */}
           <div className="bg-transparent px-6 py-3 flex items-center justify-center relative">
             <div className="absolute left-6 flex items-center space-x-2">
               <span className="w-3 h-3 bg-[#FF605C] rounded-full"></span>
@@ -236,53 +237,52 @@ export function HeroSection() {
           <div className="aspect-video relative rounded-b-3xl overflow-hidden">
             {!isPlaying && (
               <div className="absolute inset-0 z-10">
-                <Image 
-                  src="/images/headervideo/thumbnail.webp" 
-                  alt="Aperçu vidéo" 
-                  fill 
+                <Image
+                  src="/images/headervideo/thumbnail.webp"
+                  alt="Aperçu vidéo"
+                  fill
                   className="object-cover"
                 />
                 <div className="absolute inset-0 bg-black/20 backdrop-blur-[2px] flex items-center justify-center">
-                  <motion.button 
+                  <motion.button
                     onClick={handlePlayClick}
                     className="w-20 h-20 bg-white/30 backdrop-blur-md rounded-full flex items-center justify-center border border-white/40 shadow-lg"
                     variants={{
                       initial: { scale: 1 },
-                      hover: { 
+                      hover: {
                         scale: 1.05,
                         backgroundColor: "rgba(255, 255, 255, 0.4)",
                         transition: {
                           type: "spring",
                           stiffness: 300,
-                          damping: 15
-                        }
+                          damping: 15,
+                        },
                       },
-                      tap: { 
+                      tap: {
                         scale: 0.95,
                         transition: {
                           type: "spring",
                           stiffness: 400,
-                          damping: 10
-                        }
-                      }
+                          damping: 10,
+                        },
+                      },
                     }}
                     initial="initial"
                     whileHover="hover"
                     whileTap="tap"
                     aria-label="Lancer la vidéo"
                   >
-                    <svg 
-                      xmlns="http://www.w3.org/2000/svg" 
-                      viewBox="0 0 24 24" 
-                      fill="white" 
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="white"
                       className="w-10 h-10 ml-1.5"
                     >
                       <path d="M8 6.82v10.36c0 .79.87 1.27 1.54.84l8.14-5.18c.62-.39.62-1.29 0-1.69L9.54 5.98C8.87 5.55 8 6.03 8 6.82z" />
                     </svg>
                   </motion.button>
                 </div>
-                
-                {/* Barre de contrôle dans le style iOS/iPadOS */}
+
                 <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/30 to-transparent py-4 px-6 flex items-center gap-4">
                   <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" className="w-5 h-5 ml-0.5">
@@ -296,14 +296,14 @@ export function HeroSection() {
                 </div>
               </div>
             )}
-            
+
             {isVideoLoading && (
-              <motion.div 
+              <motion.div
                 className="absolute inset-0 z-20 flex items-center justify-center bg-black/20 backdrop-blur-sm"
                 initial={{ opacity: 0 }}
-                animate={{ 
+                animate={{
                   opacity: 1,
-                  transition: { duration: 0.3 }
+                  transition: { duration: 0.3 },
                 }}
               >
                 <div className="flex flex-col items-center gap-3">
@@ -311,13 +311,13 @@ export function HeroSection() {
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
-                  <motion.p 
+                  <motion.p
                     className="text-white text-sm font-medium"
                     initial={{ opacity: 0, y: 10 }}
-                    animate={{ 
-                      opacity: 1, 
+                    animate={{
+                      opacity: 1,
                       y: 0,
-                      transition: { delay: 0.2, duration: 0.3 }
+                      transition: { delay: 0.2, duration: 0.3 },
                     }}
                   >
                     Chargement...
@@ -325,7 +325,7 @@ export function HeroSection() {
                 </div>
               </motion.div>
             )}
-            
+
             {videoElement}
           </div>
         </motion.div>

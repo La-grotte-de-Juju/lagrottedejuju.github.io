@@ -1,17 +1,32 @@
-// src/components/layout/StartupNavbar.tsx
-import React, { useState, useEffect } from 'react';
+"use client";
+
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { Link as LinkIcon, Menu, X, Plus } from 'lucide-react';
+import { Link as LinkIcon, Menu as MenuIcon, X } from 'lucide-react';
 import { motion, AnimatePresence, MotionStyle } from 'framer-motion';
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
 
-const StartupNavbar = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isMounted, setIsMounted] = useState(false);
+const StartupNavbar: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
-  
+  const [isMounted, setIsMounted] = useState(false);
+  const navbarRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     const handleScroll = () => {
       const progress = Math.min(window.scrollY / 50, 1);
@@ -21,7 +36,7 @@ const StartupNavbar = () => {
     
     window.addEventListener('scroll', handleScroll);
     handleScroll();
-    
+
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
@@ -31,9 +46,16 @@ const StartupNavbar = () => {
     }, 100);
   }, []);
 
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
+  useEffect(() => {
+    if (isMenuOpen) {
+      document.body.classList.add('menu-open-blur');
+    } else {
+      document.body.classList.remove('menu-open-blur');
+    }
+    return () => {
+      document.body.classList.remove('menu-open-blur');
+    };
+  }, [isMenuOpen]);
 
   const navVariants = {
     hidden: { y: -10, opacity: 0, scale: 0.98 },
@@ -60,25 +82,12 @@ const StartupNavbar = () => {
     tap: { scale: 0.95 }
   };
 
-  const menuItemVariants = {
-    hidden: { opacity: 0, y: -5 },
-    visible: (i: number) => ({ 
-      opacity: 1, 
-      y: 0,
-      transition: { 
-        delay: i * 0.05, 
-        duration: 0.2,
-        ease: "easeOut"
-      }
-    }),
-  };
-
   const topSpacing = {
     paddingTop: `${Math.max(0, ((1 - scrollProgress) * 35))}px`,
   };
 
   const navbarStyle: MotionStyle = {
-    padding: `${0.2 + ((1 - scrollProgress) * 0.2)}rem ${1 + ((1 - scrollProgress) * 0.5)}rem`,
+    padding: `${0.2 + ((1 - scrollProgress) * 0.2)}rem ${1 + ((1 - scrollProgress) * 0.25)}rem`,
     borderRadius: `${(1 - scrollProgress) * 1}rem`,
     width: `${scrollProgress * 100 + (1 - scrollProgress) * 50}%`, 
     maxWidth: scrollProgress > 0.9 ? '100%' : `${(1 - scrollProgress) * 48 + 36}rem`,
@@ -93,31 +102,6 @@ const StartupNavbar = () => {
     position: 'relative' as const,
   };
 
-  const mobileMenuStyle: MotionStyle = {
-    borderRadius: '0.8rem',
-    boxShadow: '0 8px 25px rgba(0, 0, 0, 0.15)',
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    backdropFilter: 'blur(12px)',
-    WebkitBackdropFilter: 'blur(12px)',
-    border: '1px solid rgba(0, 0, 0, 0.06)',
-    maxHeight: 'calc(80vh)',
-    overflowY: 'auto' as const,
-    maxWidth: '90vw',
-    width: '350px',
-  };
-
-  const overlayStyle: MotionStyle = {
-    position: 'fixed' as const,
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.4)',
-    backdropFilter: 'blur(3px)',
-    WebkitBackdropFilter: 'blur(3px)',
-    zIndex: 40,
-  };
-
   return (
     <div 
       className={`fixed top-0 left-0 right-0 flex justify-center z-50 transition-all duration-500 ease-in-out`} 
@@ -130,7 +114,7 @@ const StartupNavbar = () => {
           ease-in-out
           flex items-center
           ${isMounted ? 'translate-y-0 opacity-100' : '-translate-y-3 opacity-0'}
-          ${isScrolled ? 'border-b border-gray-200/50 dark:border-gray-800/50' : 'border border-gray-200/30 dark:border-gray-800/30'}
+          ${isScrolled ? 'border-b border-gray-200/50 dark:border-gray-800/50' : 'border border-gray-200/30 dark:border-gray-800/30'}'
         `}
         initial="hidden"
         animate="visible"
@@ -197,26 +181,71 @@ const StartupNavbar = () => {
             </div>
 
             <div className="flex-shrink-0 flex items-center ml-auto">
-              <motion.div
-                whileTap={{ scale: 0.9 }}
-                whileHover={{ scale: 1.05 }}
-                transition={{ duration: 0.2 }}
-              >
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={toggleMenu}
-                  className="md:hidden text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full p-1 h-6 w-6 transition-all"
-                  aria-label="Menu"
-                >
-                  <motion.div
-                    animate={{ rotate: isMenuOpen ? 135 : 0 }}
-                    transition={{ duration: 0.2, ease: "easeInOut" }}
+              <div className="md:hidden">
+                <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+                  <SheetTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full p-1 h-7 w-7 transition-all"
+                      aria-label="Menu"
+                    >
+                      <motion.div
+                        animate={{ rotate: isMenuOpen ? 90 : 0 }}
+                        transition={{ duration: 0.2, ease: "easeInOut" }}
+                      >
+                        {isMenuOpen ? <X className="h-4 w-4" /> : <MenuIcon className="h-4 w-4" />}
+                      </motion.div>
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent 
+                    id="mobile-menu-container" 
+                    side="right" 
+                    className="w-[300px] sm:w-[350px] bg-white/80 dark:bg-black/80 border-l-gray-200/50 dark:border-l-gray-800/50 p-0"
                   >
-                    {isMenuOpen ? <X className="h-3.5 w-3.5" /> : <Plus className="h-3.5 w-3.5" />}
-                  </motion.div>
-                </Button>
-              </motion.div>
+                    <SheetClose asChild>
+                      <Button 
+                        variant="ghost" 
+                        className="absolute top-4 left-4 z-10 bg-red-500 hover:bg-red-600 text-white rounded-full p-0 h-8 w-8 flex items-center justify-center shadow-lg"
+                        aria-label="Fermer"
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </SheetClose>
+
+                    <SheetHeader className="mb-4 text-left pt-16 pb-2 px-6"> 
+                      <SheetTitle>La Grotte de Juju</SheetTitle>
+                    </SheetHeader>
+                    <div className="flex flex-col space-y-2 px-6 pb-6">
+                      <SheetClose asChild>
+                        <Link 
+                          href="/communaute" 
+                          className="text-gray-700 dark:text-gray-300 hover:bg-gray-100/70 dark:hover:bg-gray-800/70 px-3 py-2.5 rounded-md text-base font-medium flex items-center transition-all hover:pl-4"
+                        >
+                          Communauté
+                        </Link>
+                      </SheetClose>
+                      <SheetClose asChild>
+                        <Link 
+                          href="/bibliotheque" 
+                          className="text-gray-700 dark:text-gray-300 hover:bg-gray-100/70 dark:hover:bg-gray-800/70 px-3 py-2.5 rounded-md text-base font-medium flex items-center transition-all hover:pl-4"
+                        >
+                          Bibliothèque
+                        </Link>
+                      </SheetClose>
+                      <SheetClose asChild>
+                        <Link 
+                          href="/liens" 
+                          className="text-gray-700 dark:text-gray-300 hover:bg-gray-100/70 dark:hover:bg-gray-800/70 px-3 py-2.5 rounded-md text-base font-medium flex items-center transition-all hover:pl-4"
+                        >
+                          <LinkIcon className="mr-2 h-4 w-4" />
+                          Liens
+                        </Link>
+                      </SheetClose>
+                    </div>
+                  </SheetContent>
+                </Sheet>
+              </div>
               
               <motion.div
                 whileHover={{ scale: 1.05 }}
@@ -224,92 +253,42 @@ const StartupNavbar = () => {
                 transition={{ duration: 0.2 }}
                 className="hidden md:block"
               >
-                <Button
-                  variant="default"
-                  size="sm"
-                  className="hidden md:flex bg-purple-600 hover:bg-purple-700 text-white text-xs h-6 px-1.5 transition-all duration-300 hover:shadow-md hover:shadow-purple-500/20"
-                  asChild
-                >
-                  <Link href="/liens">
-                    <LinkIcon className="mr-1 h-3 w-3" />
-                    Liens
-                  </Link>
-                </Button>
+                <Link href="/liens" passHref legacyBehavior>
+                  <HoverCard openDelay={100} closeDelay={50}>
+                    <HoverCardTrigger asChild>
+                      <Button
+                        variant="default"
+                        size="lg"
+                        className="bg-purple-600 hover:bg-purple-700 text-white text-sm h-8 px-4 transition-all duration-300 hover:shadow-md hover:shadow-purple-500/20"
+                      >
+                        <LinkIcon className="mr-1.5 h-3.5 w-3.5" />
+                        Liens
+                      </Button>
+                    </HoverCardTrigger>
+                    <HoverCardContent
+                      className="w-auto p-2 bg-white/90 dark:bg-black/90 backdrop-blur-md border-gray-200/50 dark:border-gray-800/50 rounded-lg shadow-xl"
+                      sideOffset={5}
+                      align="center"
+                    >
+                      <Link href="/liens" passHref legacyBehavior>
+                        <a>
+                          <Image
+                            src="/images/linkplaceholderfullres.webp"
+                            alt="Placeholder Liens"
+                            width={300}
+                            height={150}
+                            className="rounded-md cursor-pointer"
+                            priority
+                          />
+                        </a>
+                      </Link>
+                    </HoverCardContent>
+                  </HoverCard>
+                </Link>
               </motion.div>
             </div>
           </div>
         </div>
-
-        <AnimatePresence>
-          {isMenuOpen && (
-            <>
-              <div 
-                style={overlayStyle as React.CSSProperties} 
-                onClick={toggleMenu}
-                aria-label="Fermer le menu"
-              />
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.3, ease: "easeInOut" }}
-                className="fixed z-50" 
-                style={{
-                  ...mobileMenuStyle,
-                  top: '50%' as const,
-                  left: '50%' as const,
-                  transform: 'translate(-50%, -50%)' as const
-                }}
-              >
-                <motion.div 
-                  className="px-3 py-2.5 space-y-2 flex flex-col"
-                  initial="hidden"
-                  animate="visible"
-                >
-                  <motion.div
-                    custom={0}
-                    variants={menuItemVariants}
-                  >
-                    <Link 
-                      href="/communaute" 
-                      className="text-gray-700 dark:text-gray-300 hover:bg-gray-100/70 dark:hover:bg-gray-800/70 px-3 py-2 rounded-md text-sm font-medium flex items-center transition-all hover:pl-4"
-                      onClick={toggleMenu}
-                    >
-                      Communauté
-                    </Link>
-                  </motion.div>
-                  
-                  <motion.div
-                    custom={1}
-                    variants={menuItemVariants}
-                  >
-                    <Link 
-                      href="/bibliotheque" 
-                      className="text-gray-700 dark:text-gray-300 hover:bg-gray-100/70 dark:hover:bg-gray-800/70 px-3 py-2 rounded-md text-sm font-medium flex items-center transition-all hover:pl-4"
-                      onClick={toggleMenu}
-                    >
-                      Bibliothèque
-                    </Link>
-                  </motion.div>
-                  
-                  <motion.div
-                    custom={2}
-                    variants={menuItemVariants}
-                  >
-                    <Link 
-                      href="/liens" 
-                      className="text-gray-700 dark:text-gray-300 hover:bg-gray-100/70 dark:hover:bg-gray-800/70 px-3 py-2 rounded-md text-sm font-medium flex items-center transition-all hover:pl-4"
-                      onClick={toggleMenu}
-                    >
-                      <LinkIcon className="mr-2 h-3.5 w-3.5" />
-                      Liens
-                    </Link>
-                  </motion.div>
-                </motion.div>
-              </motion.div>
-            </>
-          )}
-        </AnimatePresence>
       </motion.nav>
     </div>
   );

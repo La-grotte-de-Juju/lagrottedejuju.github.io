@@ -7,7 +7,6 @@ export default function BatlifeComicDetailPage() {
   return (
     <div className="py-12 md:py-16 lg:py-20">
       <div className="container px-4 md:px-6">
-        {/* Navigation */}
         <div className="flex items-center justify-between mb-8">
           <Link href="/dessins/batlife-comics">
             <Button variant="ghost" className="gap-1">
@@ -28,13 +27,11 @@ export default function BatlifeComicDetailPage() {
           </div>
         </div>
 
-        {/* Comic Title */}
         <div className="mb-8 text-center">
           <h1 className="text-3xl md:text-4xl font-bold">Batlife - Une nuit à Tortueville</h1>
           <p className="mt-2 text-muted-foreground">Publié le 25 Février 2024</p>
         </div>
 
-        {/* Comic Content */}
         <div className="max-w-4xl mx-auto space-y-8">
           <div className="prose prose-lg dark:prose-invert mx-auto mb-6">
             <p>
@@ -61,7 +58,6 @@ export default function BatlifeComicDetailPage() {
           </div>
         </div>
 
-        {/* Author Info */}
         <div className="mt-12 p-6 border rounded-xl bg-muted/40">
           <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
             <Image
@@ -92,7 +88,6 @@ export default function BatlifeComicDetailPage() {
           </div>
         </div>
 
-        {/* Navigation Between Comics */}
         <div className="mt-12 flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t">
           <div>
             <Link href="/dessins/batlife-comics/le-depart">
@@ -112,7 +107,6 @@ export default function BatlifeComicDetailPage() {
           </div>
         </div>
 
-        {/* Related Comics */}
         <div className="mt-16">
           <h2 className="text-2xl font-bold mb-6">Vous aimerez aussi</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">

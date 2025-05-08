@@ -13,7 +13,6 @@ interface AnimateOnScrollProps {
   once?: boolean;
 }
 
-// Animations simplifiées avec des transitions ease-in-out plus légères
 const animations = {
   fade: {
     hidden: { opacity: 0 },
@@ -86,7 +85,10 @@ export default function AnimateOnScroll({
 
   useEffect(() => {
     if (isInView) {
-      controls.start("visible");
+      const timerId = setTimeout(() => {
+        controls.start("visible");
+      }, 50); 
+      return () => clearTimeout(timerId);
     } else if (!once) {
       controls.start("hidden");
     }
@@ -103,7 +105,7 @@ export default function AnimateOnScroll({
       transition={{ 
         duration, 
         delay,
-        ease: "easeInOut"  // Animation simplifiée avec une courbe ease-in-out standard
+        ease: "easeInOut"
       }}
       style={
         animation === "card-3d" || animation === "bounce-3d" 
