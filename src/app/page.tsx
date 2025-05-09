@@ -8,7 +8,6 @@ export default function Home() {
     <>
       <HeroSection />
       <FeaturedSection />
-      <LatestVideosSection />
       <FaqSection />
     </>
   );

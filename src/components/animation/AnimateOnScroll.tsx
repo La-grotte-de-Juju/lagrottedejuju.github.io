@@ -57,14 +57,16 @@ const animations = {
     },
   },
   "bounce-3d": {
-    hidden: { 
-      y: 30, 
-      opacity: 0, 
-      rotateX: 5,
+    hidden: {
+      opacity: 0,
+      y: 100,
+      scale: 0.75,
+      rotateX: -75,
     },
-    visible: { 
-      y: 0, 
-      opacity: 1, 
+    visible: {
+      opacity: 1,
+      y: 0,
+      scale: 1,
       rotateX: 0,
     },
   },
@@ -80,14 +82,18 @@ export default function AnimateOnScroll({
   once = false,
 }: AnimateOnScrollProps) {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once, amount: threshold });
+  const isInView = useInView(ref, {
+    once,
+    amount: threshold,
+    margin: "150px 0px 150px 0px"
+  });
   const controls = useAnimation();
 
   useEffect(() => {
     if (isInView) {
       const timerId = setTimeout(() => {
         controls.start("visible");
-      }, 50); 
+      }, 1);
       return () => clearTimeout(timerId);
     } else if (!once) {
       controls.start("hidden");
@@ -96,20 +102,38 @@ export default function AnimateOnScroll({
 
   const selectedAnimation = animations[animation] || animations.fade;
 
+  let transitionConfig: {
+    duration?: number;
+    delay?: number;
+    ease?: string;
+    type?: string;
+    stiffness?: number;
+    damping?: number;
+  } = {
+    duration,
+    delay,
+    ease: "easeInOut",
+  };
+
+  if (animation === "bounce-3d") {
+    transitionConfig = {
+      type: "spring",
+      stiffness: 280,
+      damping: 20,
+      delay,
+    };
+  }
+
   return (
     <motion.div
       ref={ref}
       initial="hidden"
       animate={controls}
       variants={selectedAnimation}
-      transition={{ 
-        duration, 
-        delay,
-        ease: "easeInOut"
-      }}
+      transition={transitionConfig}
       style={
-        animation === "card-3d" || animation === "bounce-3d" 
-          ? { perspective: "1000px", transformStyle: "preserve-3d" } 
+        animation === "card-3d" || animation === "bounce-3d"
+          ? { perspective: "1000px", transformStyle: "preserve-3d" }
           : undefined
       }
       className={className}

@@ -19,7 +19,7 @@ const featuredItems = [
 		description:
 			"Explorez les personnages de Batlife et leurs histoires dans un univers riche et coloré.",
 		image: "/images/animation/fichepersos.gif",
-		link: "/series/chasseurs-de-sorciers",
+		link: "/fiches-personnages",
 	},
 	{
 		title: "Séries animées",

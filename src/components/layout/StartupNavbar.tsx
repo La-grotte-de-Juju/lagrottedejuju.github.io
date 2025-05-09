@@ -259,7 +259,7 @@ const StartupNavbar: React.FC = () => {
                       <Button
                         variant="default"
                         size="lg"
-                        className="bg-purple-600 hover:bg-purple-700 text-white text-sm h-8 px-4 transition-all duration-300 hover:shadow-md hover:shadow-purple-500/20"
+                        className="bg-purple-600 hover:!bg-purple-700 text-white text-sm h-8 px-4 transition-all duration-300 hover:shadow-md hover:shadow-purple-500/20"
                       >
                         <LinkIcon className="mr-1.5 h-3.5 w-3.5" />
                         Liens
