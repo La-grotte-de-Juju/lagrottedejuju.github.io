@@ -11,8 +11,9 @@ import {
   DialogTrigger,
   DialogClose,
 } from "@/components/ui/dialog";
-import { motion } from "framer-motion"; // Ajout de framer-motion
+import { motion } from "framer-motion";
 import AnimateOnScroll from "@/components/animation/AnimateOnScroll";
+import { Card3D } from "@/components/ui/card-3d";
 
 interface Personnage {
   id: string;
@@ -166,201 +167,163 @@ const personnages: Personnage[] = [
 ];
 
 const itemVariants = {
-  hidden: { y: 20, opacity: 0 },
+  hidden: { y: 50, opacity: 0, rotateX: 15, scale: 0.95 },
   visible: {
     y: 0,
     opacity: 1,
+    rotateX: 0,
+    scale: 1,
     transition: {
       type: "spring",
-      stiffness: 100,
+      stiffness: 85,
       damping: 12,
     },
   },
 };
 
 export default function FichesPersonnagesPage() {
+  const container = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.15,
+        delayChildren: 0.4,
+      }
+    }
+  };
+
   return (
-    <div className="pt-20 md:pt-28 lg:pt-32 pb-12 md:pb-16 lg:pb-20 bg-background text-foreground">
-      <div className="container px-4 mx-auto md:px-6">
+    <div className="py-20 md:py-24 lg:py-28">
+      <div className="container px-4 md:px-6">
+        <AnimateOnScroll animation="slide-down" delay={0.1}>
+          <div className="flex flex-col items-center text-center mb-16 md:mb-24">
+            <h1 className="text-4xl md:text-5xl font-bold tracking-tighter mb-6">
+              Fiches des Personnages
+            </h1>
+            <p className="text-muted-foreground md:text-xl max-w-[800px]">
+              Découvrez les personnages qui peuplent l'univers de La Grotte de Juju. Cliquez sur une carte pour en savoir plus sur chacun d'entre eux.
+            </p>
+          </div>
+        </AnimateOnScroll>
+
         <motion.div
-          className="flex flex-col items-center text-center mb-16 md:mb-24"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-16 px-8 py-8"
+          variants={container}
           initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.3 }}
-          variants={itemVariants} // Utilisation de itemVariants pour l'apparition simple
+          animate="show"
+          style={{ position: 'relative' }}
         >
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tighter mb-6 title-font">
-            Fiches des Personnages
-          </h1>
-          <p className="text-muted-foreground md:text-xl lg:text-2xl max-w-[800px]">
-            Découvrez en détail les personnages de l'univers de La Grotte de Juju.
-          </p>
-        </motion.div>
-
-        <div className="space-y-16 md:space-y-24">
           {personnages.map((personnage, index) => (
-            <AnimateOnScroll
-              key={personnage.id}
-              animation="bounce-3d"
-              delay={index * 0.05}
-              once={false}
-              threshold={0.5} // Increased threshold for earlier/later trigger
-            >
-              <Dialog> {/* Dialog reste la racine de la carte de personnage */}
-                <div
-                  className={`flex flex-col ${
-                    index % 2 === 0 ? "md:flex-row" : "md:flex-row-reverse"
-                  } items-center gap-8 md:gap-12 lg:gap-16 py-8 ${
-                    index < personnages.length - 1 ? "border-b border-border/30" : ""
-                  }`}
-                >
-                  {/* Image Section */}
-                  <div className="w-full md:w-2/5 lg:w-1/3 flex-shrink-0">
-                    <div className="relative aspect-[3/4] rounded-lg overflow-hidden">
-                      <Image
-                        src={personnage.image}
-                        alt="" // Image décorative pour l'ambilight
-                        fill
-                        className="object-cover scale-100 blur-lg opacity-10" // Modifié blur-xl en blur-lg
-                        aria-hidden="true"
-                        priority={index < 2}
-                      />
-                      <Image
-                        src={personnage.image}
-                        alt={personnage.name}
-                        fill
-                        className="object-contain p-4 md:p-6 relative z-10"
-                        priority={index < 2}
-                      />
-                    </div>
+            <div key={personnage.id} className="relative" style={{ margin: '40px 0' }}>
+              <AnimateOnScroll
+                animation="fancy-card"
+                delay={0.1 * (index + 1)}
+              >
+              <Dialog>
+                <DialogTrigger asChild>
+                  <div className="w-full cursor-pointer">
+                    <Card3D
+                      className="bg-card w-full rounded-xl overflow-visible"
+                      intensity={12}
+                      metallicEffect={true}
+                      glowColor="rgba(255, 255, 255, 0.9)"
+                    >
+                      <div className="aspect-[3/4] relative">
+                        <Image
+                          src={personnage.image}
+                          alt={personnage.name}
+                          fill
+                          className="object-cover"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex items-end">
+                          <div className="p-4 w-full">
+                            <h3 className="text-xl font-bold text-white mb-1 group-hover:text-primary transition-colors">
+                              {personnage.name}
+                            </h3>
+                            <p className="text-white/80 text-sm line-clamp-2">
+                              {personnage.summary}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </Card3D>
                   </div>
-
-                  {/* Text Section */}
-                  <div className="w-full md:w-3/5 lg:w-2/3 text-center md:text-left">
-                    <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 title-font text-primary">
-                      {personnage.name}
-                    </h2>
-                    <p className="text-lg md:text-xl text-muted-foreground mb-8 leading-relaxed">
-                      {personnage.summary}
-                    </p>
-                    <DialogTrigger asChild>
-                      <Button variant="outline" className="btn-premium group overflow-hidden mx-auto md:mx-0">
-                        <span className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-out"></span>
-                        <span className="relative z-10 flex items-center justify-center gap-2">
-                          Plus d'infos
-                        </span>
-                      </Button>
-                    </DialogTrigger>
-                  </div>
-                </div>
-
-                <DialogContent className="bg-white dark:bg-neutral-900 border border-neutral-200/50 dark:border-neutral-700/50 p-0 rounded-2xl shadow-lg sm:max-w-[90vw] md:max-w-[80vw] lg:max-w-[70vw] xl:max-w-[60vw] overflow-hidden">
+                </DialogTrigger>
+                <DialogContent className="max-w-3xl w-[90vw] max-h-[85vh] flex flex-col">
                   <motion.div
-                    initial="hidden"
-                    animate="visible"
-                    variants={itemVariants}
-                    className="max-h-[85vh] overflow-y-auto custom-scrollbar" // Ajout de custom-scrollbar
+                    initial={{ opacity: 0, y: 20, filter: "blur(8px)" }}
+                    animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                    transition={{ duration: 0.4, type: "spring" }}
+                    className="flex flex-col flex-grow"
                   >
-                    <DialogHeader className="p-6 pb-4 sticky top-0 bg-white/80 dark:bg-neutral-900/80 backdrop-blur-md z-10 border-b border-neutral-200/30 dark:border-neutral-700/30">
-                      <motion.div variants={itemVariants}>
-                        <DialogTitle className="text-2xl sm:text-3xl font-semibold text-neutral-900 dark:text-neutral-100 title-font text-center sm:text-left">
-                          {personnage.name}
-                        </DialogTitle>
-                      </motion.div>
+                    <DialogHeader>
+                      <DialogTitle className="text-2xl font-bold flex items-center">
+                        <span className="mr-3">{personnage.name}</span>
+                      </DialogTitle>
                     </DialogHeader>
-                    
-                    <div className="p-6 space-y-6">
-                      <motion.div variants={itemVariants}>
-                        <h3 className="text-lg font-medium text-neutral-600 dark:text-neutral-400 mb-1.5 title-font">Âge</h3>
-                        <p className="text-neutral-800 dark:text-neutral-200 p-3 rounded-lg text-base">{personnage.age}</p>
-                      </motion.div>
-
-                      <motion.div variants={itemVariants}>
-                        <h3 className="text-lg font-medium text-neutral-600 dark:text-neutral-400 mb-2 title-font">Description</h3>
-                        {personnage.fullDescription.split('\\\\n\\\\n').map((paragraph, i) => (
-                          <p key={i} className="text-neutral-700 dark:text-neutral-300 mb-3 leading-relaxed text-base first-letter:text-2xl first-letter:font-semibold first-letter:text-primary dark:first-letter:text-sky-400 first-letter:mr-0.5">
-                            {paragraph}
-                          </p>
-                        ))}
-                      </motion.div>
-
-                      <motion.div variants={itemVariants}>
-                        <h3 className="text-lg font-medium text-neutral-600 dark:text-neutral-400 mb-2 title-font">Aime</h3>
-                        <div className="flex flex-wrap gap-2">
-                          {personnage.likes.map((like, i) => (
-                            <span key={i} className="bg-sky-100 text-sky-700 dark:bg-sky-700/30 dark:text-sky-200 px-3 py-1 text-xs sm:text-sm rounded-full font-medium">
-                              {like}
-                            </span>
+                    <div className="grid md:grid-cols-3 gap-6 mt-2 overflow-y-auto pr-2 max-h-[calc(85vh-150px)]">
+                      <div className="relative">
+                        <div className="aspect-[3/4] rounded-lg overflow-hidden relative">
+                          <Image
+                            src={personnage.image}
+                            alt={personnage.name}
+                            fill
+                            className="object-cover"
+                          />
+                        </div>
+                        <div className="bg-primary text-primary-foreground text-center py-1 px-2 rounded-md mt-3 font-medium text-sm inline-block">
+                          {personnage.age}
+                        </div>
+                      </div>
+                      <div className="md:col-span-2 space-y-4">
+                        <div className="prose prose-sm dark:prose-invert">
+                          {personnage.fullDescription.split('\n\n').map((paragraph, i) => (
+                            <p key={i}>{paragraph}</p>
                           ))}
                         </div>
-                      </motion.div>
 
-                      <motion.div variants={itemVariants}>
-                        <h3 className="text-lg font-medium text-neutral-600 dark:text-neutral-400 mb-2 title-font">N'aime pas</h3>
-                        <div className="flex flex-wrap gap-2">
-                          {personnage.dislikes.map((dislike, i) => (
-                            <span key={i} className="bg-pink-100 text-pink-700 dark:bg-pink-700/30 dark:text-pink-200 px-3 py-1 text-xs sm:text-sm rounded-full font-medium">
-                              {dislike}
-                            </span>
-                          ))}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+                          <div className="bg-muted/30 p-3 rounded-lg">
+                            <h4 className="font-semibold text-primary mb-2 border-b pb-1">Aime</h4>
+                            <ul className="list-disc pl-5 space-y-1 text-sm">
+                              {personnage.likes.map((like, i) => (
+                                <li key={i}>{like}</li>
+                              ))}
+                            </ul>
+                          </div>
+                          <div className="bg-muted/30 p-3 rounded-lg">
+                            <h4 className="font-semibold text-primary mb-2 border-b pb-1">N'aime pas</h4>
+                            <ul className="list-disc pl-5 space-y-1 text-sm">
+                              {personnage.dislikes.map((dislike, i) => (
+                                <li key={i}>{dislike}</li>
+                              ))}
+                            </ul>
+                          </div>
                         </div>
-                      </motion.div>
 
-                      {personnage.anecdotes && personnage.anecdotes.length > 0 && (
-                        <motion.div variants={itemVariants}>
-                          <h3 className="text-lg font-medium text-neutral-600 dark:text-neutral-400 mb-2 title-font">Anecdotes</h3>
-                          <ul className="space-y-2.5">
+                        <div className="mt-4 bg-muted/30 p-3 rounded-lg">
+                          <h4 className="font-semibold text-primary mb-2 border-b pb-1">Anecdotes</h4>
+                          <ul className="list-disc pl-5 space-y-2 text-sm">
                             {personnage.anecdotes.map((anecdote, i) => (
-                              <li key={i} className="p-3.5 rounded-lg">
-                                <p className="text-neutral-700 dark:text-neutral-300 leading-relaxed text-sm sm:text-base">{anecdote}</p>
-                              </li>
+                              <li key={i}>{anecdote}</li>
                             ))}
                           </ul>
-                        </motion.div>
-                      )}
+                        </div>
+                      </div>
                     </div>
-                    
-                    <DialogFooter className="p-6 pt-4 sticky bottom-0 bg-white/80 dark:bg-neutral-900/80 backdrop-blur-md z-10 border-t border-neutral-200/30 dark:border-neutral-700/30">
-                      <motion.div variants={itemVariants} className="w-full">
-                        <DialogClose asChild>
-                          <Button variant="ghost" className="w-full sm:w-auto bg-neutral-200 hover:bg-neutral-300 dark:bg-neutral-700 dark:hover:bg-neutral-600 text-neutral-800 dark:text-neutral-200 focus-visible:ring-sky-500">
-                            Fermer
-                          </Button>
-                        </DialogClose>
-                      </motion.div>
+                    <DialogFooter className="mt-4 pb-1">
+                      <DialogClose asChild>
+                        <Button variant="outline">Fermer</Button>
+                      </DialogClose>
                     </DialogFooter>
                   </motion.div>
-                   {/* Hide default close button if it exists and is not targetable otherwise */}
-                  <style jsx global>{`
-                    .fixed.left-4.bottom-4.z-50 {
-                      display: none !important;
-                    }
-                    .custom-scrollbar::-webkit-scrollbar {
-                      width: 6px;
-                      height: 6px;
-                    }
-                    .custom-scrollbar::-webkit-scrollbar-track {
-                      background: transparent;
-                    }
-                    .custom-scrollbar::-webkit-scrollbar-thumb {
-                      background: #cbd5e1; /* neutral-400 */
-                      border-radius: 3px;
-                    }
-                    .dark .custom-scrollbar::-webkit-scrollbar-thumb {
-                      background: #4b5563; /* neutral-600 */
-                    }
-                    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-                      background: #9ca3af; /* neutral-500 */
-                    }
-                    .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-                      background: #6b7280; /* neutral-500 */
-                    }
-                  `}</style>
                 </DialogContent>
               </Dialog>
             </AnimateOnScroll>
+            </div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </div>
   );

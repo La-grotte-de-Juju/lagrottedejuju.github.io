@@ -99,7 +99,7 @@ const LiensPage: React.FC = () => {
 			opacity: 0,
 			y: 60,
 			rotateX: -25,
-			filter: "blur(8px)",
+			filter: "blur(16px)",
 		},
 		visible: {
 			opacity: 1,

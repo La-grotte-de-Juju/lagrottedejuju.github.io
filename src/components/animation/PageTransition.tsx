@@ -6,6 +6,7 @@ import { ReactNode } from "react";
 
 interface PageTransitionProps {
   children: ReactNode;
+  blurIntensity?: number; // Nouvelle propriété pour contrôler l'intensité du flou
 }
 
 const variants = {
@@ -14,7 +15,7 @@ const variants = {
     y: "20%",
     rotateX: -15,
     scale: 0.95,
-    filter: "blur(8px)",
+    filter: "blur(16px)", // Augmenté pour un effet plus prononcé
     borderRadius: "30px",
   },
   animate: {
@@ -30,7 +31,7 @@ const variants = {
     y: "-20%",
     rotateX: 15,
     scale: 0.95,
-    filter: "blur(8px)",
+    filter: "blur(16px)", // Augmenté pour un effet plus prononcé
     borderRadius: "30px",
   },
 };
@@ -41,8 +42,21 @@ const springTransition = {
   damping: 20,
 };
 
-export default function PageTransition({ children }: PageTransitionProps) {
+export default function PageTransition({ children, blurIntensity = 16 }: PageTransitionProps) {
   const pathname = usePathname();
+
+  // Variants personnalisés avec l'intensité de flou paramétrable
+  const customVariants = {
+    initial: {
+      ...variants.initial,
+      filter: `blur(${blurIntensity}px)`,
+    },
+    animate: variants.animate,
+    exit: {
+      ...variants.exit,
+      filter: `blur(${blurIntensity}px)`,
+    },
+  };
 
   return (
     <div style={{ perspective: "1200px", overflow: "visible" }}>
@@ -52,7 +66,7 @@ export default function PageTransition({ children }: PageTransitionProps) {
           initial="initial"
           animate="animate"
           exit="exit"
-          variants={variants}
+          variants={customVariants}
           transition={springTransition}
           style={{
             transformOrigin: "center center",
@@ -77,9 +91,9 @@ export default function PageTransition({ children }: PageTransitionProps) {
               width: "100%",
               height: "100%",
             }}
-            initial={{ opacity: 0.3 }}
-            animate={{ opacity: 0, transition: { delay: 0.3, duration: 0.4 } }}
-            exit={{ opacity: 0.3, transition: { duration: 0.2 } }}
+            initial={{ opacity: 0.3, backdropFilter: `blur(${blurIntensity/2}px)` }}
+            animate={{ opacity: 0, backdropFilter: "blur(0px)", transition: { delay: 0.3, duration: 0.4 } }}
+            exit={{ opacity: 0.3, backdropFilter: `blur(${blurIntensity/2}px)`, transition: { duration: 0.2 } }}
           />
           {children}
         </motion.div>

@@ -122,6 +122,40 @@
   overflow: hidden;
 }
 
+/* Effet carte brillante avec reflet Steam-like */
+.steam-card {
+  position: relative;
+  border-radius: 0.75rem;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  overflow: hidden;
+  transform-style: preserve-3d;
+}
+
+.steam-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    125deg,
+    rgba(255, 255, 255, 0.3) 0%,
+    rgba(255, 255, 255, 0.1) 10%,
+    rgba(255, 255, 255, 0) 30%
+  );
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.steam-card:hover {
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.25);
+}
+
+.steam-card:hover::before {
+  opacity: 1;
+}
+
 /* Effets de bouton principal brillant */
 .btn-primary-shine {
   position: relative;
