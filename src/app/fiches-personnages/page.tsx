@@ -279,7 +279,7 @@ export default function FichesPersonnagesPage() {
                       <div className="md:col-span-2 space-y-4">
                         <div className="prose prose-sm dark:prose-invert">
                           {personnage.fullDescription.split('\n\n').map((paragraph, i) => (
-                            <p key={i}>{paragraph}</p>
+                            <p key={i} className="italic">{paragraph}</p>
                           ))}
                         </div>
 
