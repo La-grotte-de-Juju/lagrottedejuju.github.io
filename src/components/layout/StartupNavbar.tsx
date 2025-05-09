@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { Link as LinkIcon, Menu as MenuIcon, X } from 'lucide-react';
+import { Link as LinkIcon, Menu as MenuIcon, X, Image as ImageIcon, BookText, Lightbulb } from 'lucide-react';
 import { motion, AnimatePresence, MotionStyle } from 'framer-motion';
 import {
   Sheet,
@@ -156,12 +156,54 @@ const StartupNavbar: React.FC = () => {
                   whileHover="hover"
                   whileTap="tap"
                 >
-                  <Link 
-                    href="/communaute" 
-                    className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white px-2 py-1.5 rounded-md text-sm font-medium transition-all hover:bg-gray-100/40 dark:hover:bg-gray-800/40"
-                  >
-                    Communauté
-                  </Link>
+                  <HoverCard openDelay={100} closeDelay={50}>
+                    <HoverCardTrigger asChild>
+                      <button 
+                        className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white px-2 py-1.5 rounded-md text-sm font-medium transition-all hover:bg-gray-100/40 dark:hover:bg-gray-800/40 cursor-pointer"
+                      >
+                        Communauté
+                      </button>
+                    </HoverCardTrigger>
+                    <HoverCardContent
+                      className="w-80 p-4 bg-white dark:bg-gray-900 border-gray-200/50 dark:border-gray-800/50 rounded-lg shadow-xl blur-card-backdrop"
+                      sideOffset={25}
+                      align="center"
+                    >
+                      <div className="space-y-4">
+                        <div className="space-y-3">
+                          <Link href="/communaute/fan-art" className="flex items-start p-2 hover:bg-gray-100/40 dark:hover:bg-gray-800/40 rounded-md transition-colors">
+                            <div className="mr-3 mt-1">
+                              <ImageIcon className="w-5 h-5 text-purple-600" />
+                            </div>
+                            <div>
+                              <div className="font-medium">Fan art</div>
+                              <p className="text-sm text-gray-500 dark:text-gray-400">Retrouve les meilleurs fanart sur l&apos;univers de Juju</p>
+                            </div>
+                          </Link>
+                          
+                          <Link href="/communaute/fan-fiction" className="flex items-start p-2 hover:bg-gray-100/40 dark:hover:bg-gray-800/40 rounded-md transition-colors">
+                            <div className="mr-3 mt-1">
+                              <BookText className="w-5 h-5 text-purple-600" />
+                            </div>
+                            <div>
+                              <div className="font-medium">Fan fiction</div>
+                              <p className="text-sm text-gray-500 dark:text-gray-400">Tu veux encore plus de contenu ? découvre le meilleur de la commu</p>
+                            </div>
+                          </Link>
+                          
+                          <Link href="/communaute/theories" className="flex items-start p-2 hover:bg-gray-100/40 dark:hover:bg-gray-800/40 rounded-md transition-colors">
+                            <div className="mr-3 mt-1">
+                              <Lightbulb className="w-5 h-5 text-purple-600" />
+                            </div>
+                            <div>
+                              <div className="font-medium">Théories</div>
+                              <p className="text-sm text-gray-500 dark:text-gray-400">Les meilleurs théories (vrai ou pas on sait pas hein qui sait mmh pas moi en tt cas)</p>
+                            </div>
+                          </Link>
+                        </div>
+                      </div>
+                    </HoverCardContent>
+                  </HoverCard>
                 </motion.div>
                 
                 <motion.div
@@ -217,14 +259,39 @@ const StartupNavbar: React.FC = () => {
                       <SheetTitle>La Grotte de Juju</SheetTitle>
                     </SheetHeader>
                     <div className="flex flex-col space-y-2 px-6 pb-6">
-                      <SheetClose asChild>
-                        <Link 
-                          href="/communaute" 
-                          className="text-gray-700 dark:text-gray-300 hover:bg-gray-100/70 dark:hover:bg-gray-800/70 px-3 py-2.5 rounded-md text-base font-medium flex items-center transition-all hover:pl-4"
+                      <div className="mb-2">
+                        <button 
+                          className="text-gray-700 dark:text-gray-300 hover:bg-gray-100/70 dark:hover:bg-gray-800/70 px-3 py-2.5 rounded-md text-base font-medium flex items-center transition-all hover:pl-4 w-full text-left"
                         >
                           Communauté
-                        </Link>
-                      </SheetClose>
+                        </button>
+                        <div className="pl-6 mt-1 space-y-1">
+                          <SheetClose asChild>
+                            <Link 
+                              href="/communaute/fan-art" 
+                              className="text-gray-600 dark:text-gray-400 hover:bg-gray-100/50 dark:hover:bg-gray-800/50 px-3 py-1.5 rounded-md text-sm flex items-center transition-all hover:pl-4"
+                            >
+                              <ImageIcon className="h-3.5 w-3.5 mr-2 text-purple-500" /> Fan art
+                            </Link>
+                          </SheetClose>
+                          <SheetClose asChild>
+                            <Link 
+                              href="/communaute/fan-fiction" 
+                              className="text-gray-600 dark:text-gray-400 hover:bg-gray-100/50 dark:hover:bg-gray-800/50 px-3 py-1.5 rounded-md text-sm flex items-center transition-all hover:pl-4"
+                            >
+                              <BookText className="h-3.5 w-3.5 mr-2 text-purple-500" /> Fan fiction
+                            </Link>
+                          </SheetClose>
+                          <SheetClose asChild>
+                            <Link 
+                              href="/communaute/theories" 
+                              className="text-gray-600 dark:text-gray-400 hover:bg-gray-100/50 dark:hover:bg-gray-800/50 px-3 py-1.5 rounded-md text-sm flex items-center transition-all hover:pl-4"
+                            >
+                              <Lightbulb className="h-3.5 w-3.5 mr-2 text-purple-500" /> Théories
+                            </Link>
+                          </SheetClose>
+                        </div>
+                      </div>
                       <SheetClose asChild>
                         <Link 
                           href="/bibliotheque" 
@@ -266,8 +333,8 @@ const StartupNavbar: React.FC = () => {
                       </Button>
                     </HoverCardTrigger>
                     <HoverCardContent
-                      className="w-auto p-2 bg-white/90 dark:bg-black/90 backdrop-blur-md border-gray-200/50 dark:border-gray-800/50 rounded-lg shadow-xl"
-                      sideOffset={5}
+                      className="w-auto p-2 bg-white dark:bg-gray-900 border-gray-200/50 dark:border-gray-800/50 rounded-lg shadow-xl blur-card-backdrop"
+                      sideOffset={25}
                       align="center"
                     >
                       <Link href="/liens" passHref legacyBehavior>
