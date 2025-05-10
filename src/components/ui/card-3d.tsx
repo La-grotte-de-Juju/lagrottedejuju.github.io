@@ -27,7 +27,7 @@ export function Card3D({
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
 
-  const springConfig = { damping: 30, stiffness: 250 };
+  const springConfig = { damping: 25, stiffness: 300 };
   
   const safeIntensity = Math.min(intensity, 12);
   
@@ -77,11 +77,19 @@ export function Card3D({
       onClick={handleClick}
       style={{
         perspective: '1200px',
-        zIndex: isHovered ? 50 : 1,
+        zIndex: isHovered ? 999 : 1, // Utiliser une valeur plus élevée pour s'assurer que l'élément passe au-dessus de tout
         position: 'relative',
         cursor: 'pointer',
+        transition: 'z-index 0.01s', // Transition rapide pour l'index z
       }}
-      whileHover={{ scale: 1.02, zIndex: 50 }}
+      whileHover={{ 
+        scale: 1.15, // Augmenter l'échelle pour un agrandissement plus visible
+        zIndex: 999, 
+        transition: { 
+          scale: { type: "spring", stiffness: 300, damping: 15 }, 
+          zIndex: { delay: 0 }
+        }
+      }}
     >
       <motion.div
         className="w-full h-full"
@@ -92,7 +100,7 @@ export function Card3D({
           borderRadius,
           transformOrigin: 'center center',
           boxShadow: isHovered 
-            ? '0 20px 40px rgba(0, 0, 0, 0.25)' 
+            ? '0 25px 50px rgba(0, 0, 0, 0.35)' 
             : '0 10px 20px rgba(0, 0, 0, 0.1)',
           transition: 'box-shadow 0.3s',
           position: 'relative',

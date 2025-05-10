@@ -212,10 +212,10 @@ export default function FichesPersonnagesPage() {
           variants={container}
           initial="hidden"
           animate="show"
-          style={{ position: 'relative' }}
+          style={{ position: 'relative', padding: '20px' }}
         >
           {personnages.map((personnage, index) => (
-            <div key={personnage.id} className="relative" style={{ margin: '40px 0' }}>
+            <div key={personnage.id} className="relative" style={{ margin: '40px 0', padding: '20px', transformStyle: 'preserve-3d' }}>
               <AnimateOnScroll
                 animation="fancy-card"
                 delay={0.1 * (index + 1)}
