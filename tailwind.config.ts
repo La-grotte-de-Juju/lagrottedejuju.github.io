@@ -1,4 +1,5 @@
 import type { Config } from "tailwindcss";
+import tailwindcssAnimate from "tailwindcss-animate";
 
 export default {
     darkMode: ["class"],
@@ -97,6 +98,10 @@ export default {
   					height: '0'
   				}
   			},
+        'border-flow': {
+          '0%, 100%': { backgroundPosition: '0% 50%' },
+          '50%': { backgroundPosition: '100% 50%' },
+        },
         'fade-in': {
           '0%': { opacity: '0' },
           '100%': { opacity: '1' },
@@ -145,6 +150,7 @@ export default {
         'slide-right': 'slide-right 0.5s ease-out forwards',
         'scale-in': 'scale-in 0.5s ease-out forwards',
         'rotate-in': 'rotate-in 0.5s ease-out forwards',
+        'border-flow': 'border-flow 3s ease infinite',
         'apple-gradient': 'apple-gradient-shift 6s ease infinite',
   		},
       backgroundImage: {
@@ -154,6 +160,6 @@ export default {
   	}
   },
   plugins: [
-    require("tailwindcss-animate"),
+	tailwindcssAnimate,
   ],
 } satisfies Config;

@@ -1,0 +1,568 @@
+"use client";
+
+import { useState, useEffect, useCallback } from "react";
+import { Card } from "../ui/card";
+import { ImageIcon, Loader2, X, Search } from "lucide-react";
+import { FanArtViewer } from "./FanArtViewer";
+
+interface FanArt {
+  name: string;
+  download_url: string;
+  path: string;
+  sha: string;
+}
+
+export default function FanArtGallery() {
+  // Pour les fan arts premium
+  const [premiumFanArts, setPremiumFanArts] = useState<FanArt[]>([]);
+  const [filteredPremiumFanArts, setFilteredPremiumFanArts] = useState<FanArt[]>([]);
+  const [loadingPremium, setLoadingPremium] = useState(true);
+  const [errorPremium, setErrorPremium] = useState<string | null>(null);
+  
+  // Pour les fan arts classiques
+  const [classicFanArts, setClassicFanArts] = useState<FanArt[]>([]);
+  const [filteredClassicFanArts, setFilteredClassicFanArts] = useState<FanArt[]>([]);
+  const [loadingClassic, setLoadingClassic] = useState(true);
+  const [errorClassic, setErrorClassic] = useState<string | null>(null);
+  
+  // États communs
+  const [selectedFanArt, setSelectedFanArt] = useState<FanArt | null>(null);
+  const [viewerOpen, setViewerOpen] = useState(false);
+  const [sortOrder, setSortOrder] = useState<'newest' | 'oldest' | 'alphabetical'>('newest');
+  const [searchQuery, setSearchQuery] = useState<string>('');
+
+  // Fonction pour récupérer les fan arts avec useCallback
+  const fetchFanArts = useCallback(async (category: 'prime' | 'classic') => {
+    const setLoading = category === 'prime' ? setLoadingPremium : setLoadingClassic;
+    const setError = category === 'prime' ? setErrorPremium : setErrorClassic;
+    const setFanArts = category === 'prime' ? setPremiumFanArts : setClassicFanArts;
+    const setFilteredFanArts = category === 'prime' ? setFilteredPremiumFanArts : setFilteredClassicFanArts;
+    
+    setLoading(true);
+    
+    try {
+      // Check local storage cache first
+      const cacheKey = `fanArtsCache-${category}`;
+      const timestampKey = `fanArtsCacheTimestamp-${category}`;
+      const cachedData = localStorage.getItem(cacheKey);
+      const cachedTimestamp = localStorage.getItem(timestampKey);
+      const now = new Date().getTime();
+      
+      // If we have cached data and it's less than 30 minutes old, use it
+      if (cachedData && cachedTimestamp && now - parseInt(cachedTimestamp) < 30 * 60 * 1000) {
+        const parsedData = JSON.parse(cachedData);
+        setFanArts(parsedData);
+        setFilteredFanArts(sortFanArts(parsedData, sortOrder));
+        setLoading(false);
+        return;
+      }
+      
+      // Otherwise fetch from API
+      const response = await fetch(
+        `https://api.github.com/repos/La-grotte-de-Juju/La-grotte-de-Juju-Ressources/contents/Fanarts/${category}`,
+        {
+          headers: {
+            Accept: "application/vnd.github.v3+json",
+          },
+          cache: "no-store",
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Erreur lors de la récupération des fan arts: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      
+      // Filter only image files
+      const imageExtensions = [".jpg", ".jpeg", ".png", ".gif", ".webp"];
+      const imageFiles = data.filter((item: {type: string; name: string}) =>
+        item.type === "file" &&
+        imageExtensions.some(ext => item.name.toLowerCase().endsWith(ext))
+      );
+
+      // Add raw content URL to each image
+      const fanArtsWithUrls = imageFiles.map((file: {name: string; download_url: string; path: string; sha: string}) => ({
+        name: file.name,
+        download_url: file.download_url,
+        path: file.path,
+        sha: file.sha
+      }));
+
+      // Save to localStorage cache
+      try {
+        localStorage.setItem(cacheKey, JSON.stringify(fanArtsWithUrls));
+        localStorage.setItem(timestampKey, new Date().getTime().toString());
+      } catch (e) {
+        console.warn(`Failed to cache ${category} fan arts data:`, e);
+      }
+
+      setFanArts(fanArtsWithUrls);
+      setFilteredFanArts(sortFanArts(fanArtsWithUrls, sortOrder));
+    } catch (err) {
+      console.error(`Erreur lors de la récupération des fan arts ${category}:`, err);
+      setError(`Impossible de charger les fan arts ${category === 'prime' ? 'premium' : 'classiques'}. Veuillez réessayer plus tard.`);
+    } finally {
+      setLoading(false);
+    }
+  }, [sortOrder]);
+
+  // Charger les deux catégories de fan arts au chargement
+  useEffect(() => {
+    fetchFanArts('prime');
+    fetchFanArts('classic');
+  }, [fetchFanArts]);
+
+  // Fonction pour trier les fan arts selon différents critères
+  const sortFanArts = (arts: FanArt[], order: 'newest' | 'oldest' | 'alphabetical'): FanArt[] => {
+    const sorted = [...arts];
+
+    switch (order) {
+      case 'alphabetical':
+        return sorted.sort((a, b) => a.name.localeCompare(b.name));
+      case 'newest':
+        // Pour simuler un tri par date, on utilise le sha comme approximation
+        return sorted.sort((a, b) => b.sha.localeCompare(a.sha));
+      case 'oldest':
+        return sorted.sort((a, b) => a.sha.localeCompare(b.sha));
+      default:
+        return sorted;
+    }
+  };
+  
+  // Appliquer le tri et le filtrage lorsque le critère change pour les fan arts premium
+  useEffect(() => {
+    if (premiumFanArts.length > 0) {
+      let results = [...premiumFanArts];
+      
+      // Filtre par recherche si on a un terme de recherche
+      if (searchQuery.trim()) {
+        const query = searchQuery.trim().toLowerCase();
+        results = results.filter(art => 
+          art.name.toLowerCase().includes(query)
+        );
+      }
+      
+      // Trier les résultats
+      results = sortFanArts(results, sortOrder);
+      
+      setFilteredPremiumFanArts(results);
+    }
+  }, [sortOrder, premiumFanArts, searchQuery]);
+
+  // Appliquer le tri et le filtrage lorsque le critère change pour les fan arts classiques
+  useEffect(() => {
+    if (classicFanArts.length > 0) {
+      let results = [...classicFanArts];
+      
+      // Filtre par recherche si on a un terme de recherche
+      if (searchQuery.trim()) {
+        const query = searchQuery.trim().toLowerCase();
+        results = results.filter(art => 
+          art.name.toLowerCase().includes(query)
+        );
+      }
+      
+      // Trier les résultats
+      results = sortFanArts(results, sortOrder);
+      
+      setFilteredClassicFanArts(results);
+    }
+  }, [sortOrder, classicFanArts, searchQuery]);
+
+  const handleFanArtClick = (fanArt: FanArt, source?: 'premium' | 'classic') => {
+    setSelectedFanArt(fanArt);
+    setViewerOpen(true);
+  };
+
+  const handleCloseViewer = () => {
+    setViewerOpen(false);
+  };
+  
+  // Gérer la navigation entre les images en mode plein écran
+  useEffect(() => {
+    const handleNext = (event: Event) => {
+      const customEvent = event as CustomEvent;
+      setSelectedFanArt(customEvent.detail.fanArt);
+    };
+    
+    const handlePrev = (event: Event) => {
+      const customEvent = event as CustomEvent;
+      setSelectedFanArt(customEvent.detail.fanArt);
+    };
+    
+    document.addEventListener('nextFanArt', handleNext);
+    document.addEventListener('prevFanArt', handlePrev);
+    
+    return () => {
+      document.removeEventListener('nextFanArt', handleNext);
+      document.removeEventListener('prevFanArt', handlePrev);
+    };
+  }, []);
+  
+  // Pas besoin de l'effet de réinitialisation des filtres qui dépendait de category
+
+  // Affichage du chargement global si les deux sections sont en cours de chargement
+  if (loadingPremium && loadingClassic) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[40vh] p-8">
+        <img 
+          src="/images/JujuLoading.gif" 
+          alt="Chargement en cours" 
+          className="w-20 h-20 mb-4"
+        />
+        <p className="text-xl text-gray-600 dark:text-gray-400">Acquisition des images depuis l'API...</p>
+      </div>
+    );
+  }
+
+  // Affichage des erreurs si les deux parties ont échoué
+  if (errorPremium && errorClassic) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[40vh] p-8 text-center">
+        <ImageIcon className="h-16 w-16 text-red-500 mb-4" />
+        <p className="text-xl font-medium mb-2">Oups! Une erreur est survenue</p>
+        <p className="text-gray-600 dark:text-gray-400">
+          {errorPremium}<br />
+          {errorClassic}
+        </p>
+      </div>
+    );
+  }
+
+  // Calcul du nombre total d'images affichées
+  const totalImages = filteredPremiumFanArts.length + filteredClassicFanArts.length;
+  const totalOriginalImages = premiumFanArts.length + classicFanArts.length;
+  
+  return (
+    <div className="flex flex-col md:flex-row gap-4">
+      {/* Barre latérale fixe pour PC - cachée sur mobile - centrée verticalement */}
+      <div className="hidden md:block md:w-64 lg:w-72 flex-shrink-0">
+        <div className="sticky top-32 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md p-4 rounded-lg border border-gray-200 dark:border-gray-800 shadow-sm">
+          <div className="flex flex-col gap-5">
+            {/* Recherche */}
+            <div className="relative w-full">
+              <label htmlFor="search" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                Rechercher des fan arts
+              </label>
+              <div className="relative">
+                <input
+                  type="text"
+                  id="search"
+                  placeholder="Rechercher..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md pl-9 pr-4 py-2 text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                />
+                <div className="absolute left-3 top-2.5 text-gray-400">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-search">
+                    <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
+                  </svg>
+                </div>
+                {searchQuery && (
+                  <button 
+                    onClick={() => setSearchQuery('')}
+                    className="absolute right-2 top-2.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                    aria-label="Effacer la recherche"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
+            </div>
+            
+            {/* Tri */}
+            <div>
+              <label htmlFor="sort-order" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                Trier par
+              </label>
+              <select
+                id="sort-order"
+                value={sortOrder}
+                onChange={(e) => setSortOrder(e.target.value as 'newest' | 'oldest' | 'alphabetical')}
+                className="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md px-3 py-2 text-sm w-full focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              >
+                <option value="newest">Plus récent</option>
+                <option value="oldest">Plus ancien</option>
+                <option value="alphabetical">Alphabétique</option>
+              </select>
+            </div>
+            
+            {/* Compteur de résultats */}
+            {totalOriginalImages > 0 && (
+              <div className="text-sm text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800/50 p-3 rounded-md">
+                <div className="font-medium mb-1">Statistiques</div>
+                <div className="flex justify-between">
+                  <span>Fan arts premium:</span>
+                  <span className="font-medium">{filteredPremiumFanArts.length}</span>
+                </div>
+                <div className="flex justify-between mt-1">
+                  <span>Fan arts standards:</span>
+                  <span className="font-medium">{filteredClassicFanArts.length}</span>
+                </div>
+                <div className="border-t border-gray-200 dark:border-gray-700 my-2"></div>
+                <div className="flex justify-between">
+                  <span>Total affiché:</span> 
+                  <span className="font-medium">{totalImages}</span>
+                </div>
+              </div>
+            )}
+            
+            {/* Message "Tu as créé un fan art" */}
+            <div className="relative p-[3px] rounded-md overflow-hidden shadow-lg">
+              {/* Gradient border avec effet de glow */}
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 animate-border-flow rounded-md blur-[3px]"></div>
+              {/* Extra glow effect */}
+              <div className="absolute inset-0 opacity-50 bg-gradient-to-r from-blue-400/30 via-purple-500/30 to-pink-500/30 rounded-md blur-xl"></div>
+              
+              {/* Contenu */}
+              <div className="relative bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm p-4 rounded-md">
+                <h3 className="text-base font-semibold mb-2 bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent bg-[length:200%_auto] animate-border-flow">Tu as créé un fan art ?</h3>
+                <p className="text-sm text-gray-700 dark:text-gray-300">
+                  Partage ta création avec nous sur les réseaux sociaux ou contacte-nous directement pour l'ajouter à la galerie !
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      {/* Contenu principal */}
+      <div className="flex-1">
+        {/* Barre mobile - visible uniquement sur mobile */}
+        <div className="md:hidden flex flex-col gap-4 mb-6 px-3">
+          <div className="relative w-full">
+            <input
+              type="text"
+              placeholder="Rechercher des fan arts..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md pl-9 pr-4 py-3 text-base focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+            />
+            <div className="absolute left-3 top-3.5 text-gray-400">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-search">
+                <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
+              </svg>
+            </div>
+            {searchQuery && (
+              <button 
+                onClick={() => setSearchQuery('')}
+                className="absolute right-3 top-3.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                aria-label="Effacer la recherche"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            )}
+          </div>
+          
+          <div className="flex items-center gap-2 w-full">
+            <label htmlFor="mobile-sort-order" className="text-sm font-medium text-gray-600 dark:text-gray-400 whitespace-nowrap">
+              Trier par:
+            </label>
+            <select
+              id="mobile-sort-order"
+              value={sortOrder}
+              onChange={(e) => setSortOrder(e.target.value as 'newest' | 'oldest' | 'alphabetical')}
+              className="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md px-3 py-2 text-base w-full focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+            >
+              <option value="newest">Plus récent</option>
+              <option value="oldest">Plus ancien</option>
+              <option value="alphabetical">Alphabétique</option>
+            </select>
+          </div>
+          
+          {/* Compteur mobile */}
+          {totalOriginalImages > 0 && (
+            <div className="text-sm text-gray-500 dark:text-gray-400">
+              {totalImages === totalOriginalImages ? (
+                <span>Affichage de tous les {totalOriginalImages} fan arts</span>
+              ) : (
+                <span>{totalImages} fan art{totalImages > 1 ? 's' : ''} affichés sur {totalOriginalImages} au total</span>
+              )}
+            </div>
+          )}
+        </div>
+        
+        {/* Section Fan Arts Premium */}
+      <div className="mb-12">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between px-4 mb-4 gap-2">
+          <h2 className="text-2xl font-bold bg-gradient-to-r from-yellow-500 to-amber-400 bg-clip-text text-transparent flex items-center gap-2">
+            <span>Sélection Premium</span>
+            <span className="text-yellow-500">★</span>
+          </h2>
+          <div className="text-sm text-gray-500 dark:text-gray-400">
+            {filteredPremiumFanArts.length} œuvres
+          </div>
+        </div>
+        
+        {loadingPremium ? (
+          <div className="flex flex-col items-center justify-center p-8">
+            <img 
+              src="/images/JujuLoading.gif" 
+              alt="Chargement en cours" 
+              className="w-16 h-16 mb-2"
+            />
+            <p className="text-sm text-gray-500 dark:text-gray-400">Acquisition des images...</p>
+          </div>
+        ) : errorPremium ? (
+          <div className="bg-red-50 dark:bg-red-900/20 rounded-lg p-4 mx-4">
+            <p className="text-red-600 dark:text-red-400">{errorPremium}</p>
+          </div>
+        ) : filteredPremiumFanArts.length === 0 ? (
+          <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4 md:p-6 mx-2 md:mx-4 text-center">
+            <p className="text-gray-500 dark:text-gray-400 text-sm md:text-base">
+              {searchQuery ? (
+                <>Aucun Fan Art premium ne correspond à votre recherche.</>
+              ) : (
+                <>Aucun Fan Art premium disponible pour le moment.</>
+              )}
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6 p-3 md:p-4">
+            {filteredPremiumFanArts.map((fanArt, index) => (
+              <Card
+                key={fanArt.sha}
+                className="overflow-hidden hover:shadow-lg transition-all duration-300 hover:scale-[1.02] transform cursor-pointer group animate-fadeIn bg-yellow-50/20 dark:bg-yellow-900/10"
+                style={{ animationDelay: `${index * 100}ms` }}
+                onClick={() => handleFanArtClick(fanArt, 'premium')}
+              >
+                <div className="relative aspect-square overflow-hidden">
+                  {/* Loading indicator shown while the image is loading */}
+                  <div className="absolute inset-0 flex items-center justify-center bg-gray-100 dark:bg-gray-800 z-10 transition-opacity group-hover:opacity-0">
+                    <img 
+                      src="/images/JujuLoading.gif" 
+                      alt="Chargement" 
+                      className="w-12 h-12" 
+                    />
+                  </div>
+                  
+                  <img
+                    src={fanArt.download_url}
+                    alt={`Fan art premium: ${fanArt.name}`}
+                    className="w-full h-full object-cover transition-all duration-500 group-hover:scale-110"
+                    loading="lazy"
+                    onLoad={(e) => {
+                      // Hide loader when image loads
+                      const target = e.target as HTMLImageElement;
+                      const parent = target.parentElement;
+                      if (parent) {
+                        const loader = parent.querySelector('div');
+                        if (loader) loader.style.display = 'none';
+                      }
+                    }}
+                  />
+                  
+                  {/* Overlay that appears on hover */}
+                  <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <div className="p-2 bg-white/20 backdrop-blur-sm rounded-full">
+                      <ImageIcon className="h-6 w-6 text-white" />
+                    </div>
+                  </div>
+                </div>
+                <div className="p-2 md:p-3 bg-black/5 dark:bg-white/5 flex items-center justify-between">
+                  <h3 className="font-medium text-xs md:text-sm truncate">{fanArt.name.replace(/\.(jpg|jpeg|png|gif|webp)$/i, '')}</h3>
+                  <span className="text-yellow-500 text-xs flex-shrink-0 ml-1" title="Fan art premium">★</span>
+                </div>
+              </Card>
+            ))}
+          </div>
+        )}
+      </div>
+      
+      {/* Section Fan Arts Classiques */}
+      <div className="mt-8">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between px-4 mb-4 gap-2">
+          <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">
+            Tous les Fan Arts
+          </h2>
+          <div className="text-sm text-gray-500 dark:text-gray-400">
+            {filteredClassicFanArts.length} œuvres
+          </div>
+        </div>
+        
+        {loadingClassic ? (
+          <div className="flex flex-col items-center justify-center p-8">
+            <img 
+              src="/images/JujuLoading.gif" 
+              alt="Chargement en cours" 
+              className="w-16 h-16 mb-2"
+            />
+            <p className="text-sm text-gray-500 dark:text-gray-400">Acquisition des images...</p>
+          </div>
+        ) : errorClassic ? (
+          <div className="bg-red-50 dark:bg-red-900/20 rounded-lg p-4 mx-4">
+            <p className="text-red-600 dark:text-red-400">{errorClassic}</p>
+          </div>
+        ) : filteredClassicFanArts.length === 0 ? (
+          <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4 md:p-6 mx-2 md:mx-4 text-center">
+            <p className="text-gray-500 dark:text-gray-400 text-sm md:text-base">
+              {searchQuery ? (
+                <>Aucun Fan Art classique ne correspond à votre recherche.</>
+              ) : (
+                <>Aucun Fan Art disponible pour le moment.</>
+              )}
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6 p-3 md:p-4">
+            {filteredClassicFanArts.map((fanArt, index) => (
+              <Card
+                key={fanArt.sha}
+                className="overflow-hidden hover:shadow-lg transition-all duration-300 hover:scale-[1.02] transform cursor-pointer group animate-fadeIn"
+                style={{ animationDelay: `${index * 100}ms` }}
+                onClick={() => handleFanArtClick(fanArt, 'classic')}
+              >
+                <div className="relative aspect-square overflow-hidden">
+                  {/* Loading indicator shown while the image is loading */}
+                  <div className="absolute inset-0 flex items-center justify-center bg-gray-100 dark:bg-gray-800 z-10 transition-opacity group-hover:opacity-0">
+                    <img 
+                      src="/images/JujuLoading.gif" 
+                      alt="Chargement" 
+                      className="w-12 h-12" 
+                    />
+                  </div>
+                  
+                  <img
+                    src={fanArt.download_url}
+                    alt={`Fan art: ${fanArt.name}`}
+                    className="w-full h-full object-cover transition-all duration-500 group-hover:scale-110"
+                    loading="lazy"
+                    onLoad={(e) => {
+                      // Hide loader when image loads
+                      const target = e.target as HTMLImageElement;
+                      const parent = target.parentElement;
+                      if (parent) {
+                        const loader = parent.querySelector('div');
+                        if (loader) loader.style.display = 'none';
+                      }
+                    }}
+                  />
+                  
+                  {/* Overlay that appears on hover */}
+                  <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <div className="p-2 bg-white/20 backdrop-blur-sm rounded-full">
+                      <ImageIcon className="h-6 w-6 text-white" />
+                    </div>
+                  </div>
+                </div>
+                <div className="p-2 md:p-3 bg-black/5 dark:bg-white/5">
+                  <h3 className="font-medium text-xs md:text-sm truncate">{fanArt.name.replace(/\.(jpg|jpeg|png|gif|webp)$/i, '')}</h3>
+                </div>
+              </Card>
+            ))}
+          </div>
+        )}
+      </div>
+      
+      {/* Visionneuse plein écran */}
+      <FanArtViewer
+        fanArt={selectedFanArt}
+        isOpen={viewerOpen}
+        onClose={handleCloseViewer}
+        allFanArts={[...filteredPremiumFanArts, ...filteredClassicFanArts]} // Combinaison des deux catégories
+      />
+      </div>
+    </div>
+  );
+}

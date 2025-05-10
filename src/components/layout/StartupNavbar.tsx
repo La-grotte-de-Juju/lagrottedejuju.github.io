@@ -171,7 +171,7 @@ const StartupNavbar: React.FC = () => {
                     >
                       <div className="space-y-4">
                         <div className="space-y-3">
-                          <Link href="/communaute/fan-art" className="flex items-start p-2 hover:bg-gray-100/40 dark:hover:bg-gray-800/40 rounded-md transition-colors">
+                          <Link href="/fan-art" className="flex items-start p-2 hover:bg-gray-100/40 dark:hover:bg-gray-800/40 rounded-md transition-colors">
                             <div className="mr-3 mt-1">
                               <ImageIcon className="w-5 h-5 text-purple-600" />
                             </div>
@@ -181,7 +181,7 @@ const StartupNavbar: React.FC = () => {
                             </div>
                           </Link>
                           
-                          <Link href="/communaute/fan-fiction" className="flex items-start p-2 hover:bg-gray-100/40 dark:hover:bg-gray-800/40 rounded-md transition-colors">
+                          <Link href="/fan-fiction" className="flex items-start p-2 hover:bg-gray-100/40 dark:hover:bg-gray-800/40 rounded-md transition-colors">
                             <div className="mr-3 mt-1">
                               <BookText className="w-5 h-5 text-purple-600" />
                             </div>
@@ -191,7 +191,7 @@ const StartupNavbar: React.FC = () => {
                             </div>
                           </Link>
                           
-                          <Link href="/communaute/theories" className="flex items-start p-2 hover:bg-gray-100/40 dark:hover:bg-gray-800/40 rounded-md transition-colors">
+                          <Link href="/theories" className="flex items-start p-2 hover:bg-gray-100/40 dark:hover:bg-gray-800/40 rounded-md transition-colors">
                             <div className="mr-3 mt-1">
                               <Lightbulb className="w-5 h-5 text-purple-600" />
                             </div>
@@ -268,7 +268,7 @@ const StartupNavbar: React.FC = () => {
                         <div className="pl-6 mt-1 space-y-1">
                           <SheetClose asChild>
                             <Link 
-                              href="/communaute/fan-art" 
+                              href="/fan-art"
                               className="text-gray-600 dark:text-gray-400 hover:bg-gray-100/50 dark:hover:bg-gray-800/50 px-3 py-1.5 rounded-md text-sm flex items-center transition-all hover:pl-4"
                             >
                               <ImageIcon className="h-3.5 w-3.5 mr-2 text-purple-500" /> Fan art
@@ -276,7 +276,7 @@ const StartupNavbar: React.FC = () => {
                           </SheetClose>
                           <SheetClose asChild>
                             <Link 
-                              href="/communaute/fan-fiction" 
+                              href="/fan-fiction" 
                               className="text-gray-600 dark:text-gray-400 hover:bg-gray-100/50 dark:hover:bg-gray-800/50 px-3 py-1.5 rounded-md text-sm flex items-center transition-all hover:pl-4"
                             >
                               <BookText className="h-3.5 w-3.5 mr-2 text-purple-500" /> Fan fiction
@@ -284,7 +284,7 @@ const StartupNavbar: React.FC = () => {
                           </SheetClose>
                           <SheetClose asChild>
                             <Link 
-                              href="/communaute/theories" 
+                              href="/theories" 
                               className="text-gray-600 dark:text-gray-400 hover:bg-gray-100/50 dark:hover:bg-gray-800/50 px-3 py-1.5 rounded-md text-sm flex items-center transition-all hover:pl-4"
                             >
                               <Lightbulb className="h-3.5 w-3.5 mr-2 text-purple-500" /> Théories
