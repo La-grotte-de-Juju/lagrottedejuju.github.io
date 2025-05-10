@@ -1,0 +1,23 @@
+.nav-fixed-button {
+  transform: translateY(-50%) !important;
+  transition: none !important;
+  will-change: auto !important;
+  backface-visibility: visible !important;
+  transform-style: flat !important;
+  pointer-events: auto !important;
+}
+
+.nav-fixed-button:hover, 
+.nav-fixed-button:focus,
+.nav-fixed-button:active {
+  transform: translateY(-50%) !important;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.25) !important;
+  border: none !important;
+  background-color: rgba(0, 0, 0, 0.4) !important;
+}
+
+.nav-fixed-button::before,
+.nav-fixed-button::after {
+  content: none !important;
+  display: none !important;
+}

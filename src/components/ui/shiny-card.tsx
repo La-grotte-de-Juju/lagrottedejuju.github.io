@@ -6,35 +6,35 @@ import { motion, useMotionValue, useTransform, useSpring } from 'framer-motion';
 interface ShinyCardProps {
   children: React.ReactNode;
   className?: string;
-  intensity?: number; // Intensité de l'effet de parallax (1-10)
-  shineIntensity?: number; // Intensité de l'effet brillant (1-10)
+  intensity?: number; 
+  shineIntensity?: number; 
   borderRadius?: string;
 }
 
 export function ShinyCard({
   children,
   className = '',
-  intensity = 10, // Augmenté l'intensité par défaut pour un effet plus prononcé
-  shineIntensity = 0.5, // Augmenté l'intensité de brillance
+  intensity = 10, 
+  shineIntensity = 0.5, 
   borderRadius = '0.75rem',
 }: ShinyCardProps) {
   const cardRef = useRef<HTMLDivElement>(null);
   const [isHovered, setIsHovered] = useState(false);
 
-  // Valeurs de mouvement pour le suivi de la souris
+  
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
 
-  // Configuration des valeurs de rotation et de perspective - augmenté pour un effet plus prononcé
-  const rotateX = useTransform(mouseY, [-0.5, 0.5], [-intensity * 1.2, intensity * 1.2]); // Direction corrigée pour une rotation naturelle
-  const rotateY = useTransform(mouseX, [-0.5, 0.5], [intensity * 1.2, -intensity * 1.2]); // Direction corrigée pour une rotation naturelle
+  
+  const rotateX = useTransform(mouseY, [-0.5, 0.5], [-intensity * 1.2, intensity * 1.2]); 
+  const rotateY = useTransform(mouseX, [-0.5, 0.5], [intensity * 1.2, -intensity * 1.2]); 
 
-  // Appliquer un effet de ressort pour une animation plus fluide - amélioré pour plus de réactivité
-  const springConfig = { damping: 18, stiffness: 170 }; // Réduction de l'amortissement, augmentation de la raideur
+  
+  const springConfig = { damping: 18, stiffness: 170 }; 
   const springRotateX = useSpring(rotateX, springConfig);
   const springRotateY = useSpring(rotateY, springConfig);
 
-  // Position pour l'effet brillant - étendu pour un meilleur mouvement
+  
   const shineX = useTransform(mouseX, [-0.5, 0.5], [-50, 150], {
     clamp: false,
   });
@@ -42,7 +42,7 @@ export function ShinyCard({
     clamp: false,
   });
 
-  // Variables d'ombre définies mais non utilisées
+  
   const shadowBlur = useTransform(
     mouseY, 
     [-0.5, 0, 0.5], 
@@ -64,16 +64,16 @@ export function ShinyCard({
     [0, 3, 0]
   );
   
-  // Intensité de l'ombre basée sur le survol
+  
   const shadowOpacity = isHovered ? 0.5 : 0.3;
   
-  // Box shadow vide pour supprimer l'effet d'ombre
+  
   const boxShadow = useTransform(
     [shadowBlur, shadowX, shadowY, shadowSpread],
     () => 'none'
   );
 
-  // Gérer le mouvement de la souris sur la carte
+  
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!cardRef.current) return;
 
@@ -81,7 +81,7 @@ export function ShinyCard({
     const centerX = rect.left + rect.width / 2;
     const centerY = rect.top + rect.height / 2;
     
-    // Calculer la position relative de la souris sur la carte (-0.5 à 0.5)
+    
     const relativeX = (e.clientX - centerX) / rect.width;
     const relativeY = (e.clientY - centerY) / rect.height;
     
@@ -94,7 +94,7 @@ export function ShinyCard({
       ref={cardRef}
       className={`${className} relative`}
       style={{
-        perspective: '800px', // Perspective réduite pour un effet 3D plus prononcé
+        perspective: '800px',
         transformStyle: 'preserve-3d',
         rotateX: springRotateX,
         rotateY: springRotateY,
@@ -111,7 +111,7 @@ export function ShinyCard({
         transition: { type: "spring", stiffness: 300, damping: 15 }
       }}
     >
-      {/* Conteneur principal - tout est dans la même transformation 3D */}
+      
       <motion.div
         className="relative w-full h-full overflow-hidden"
         style={{
@@ -121,7 +121,7 @@ export function ShinyCard({
           boxShadow,
         }}
       >
-        {/* Contenu de la carte */}
+        
         <div 
           className="w-full h-full relative z-10" 
           style={{ 
@@ -132,7 +132,7 @@ export function ShinyCard({
           {children}
         </div>
 
-        {/* Effet brillant principal - style Steam avec point lumineux intense */}
+        
         <motion.div
           className="absolute inset-0 pointer-events-none z-20"
           style={{
@@ -149,7 +149,7 @@ export function ShinyCard({
           }}
         />
 
-        {/* Effet de contour brillant - style Steam */}
+        
         <motion.div
           className="absolute inset-0 pointer-events-none z-10 opacity-70"
           style={{
@@ -161,7 +161,7 @@ export function ShinyCard({
           }}
         />
         
-        {/* Effet de reflet latéral dynamique - style Steam */}
+        
         <motion.div
           className="absolute inset-0 pointer-events-none z-15 opacity-60"
           style={{
