@@ -30,18 +30,6 @@ export default function FanArtPage() {
           <p className="mt-4 text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto mb-4">
             Découvrez les créations incroyables de la communauté de La Grotte de Juju.
           </p>
-          <div className="flex flex-wrap justify-center gap-2 md:gap-3 items-center mt-4">
-            <div className="inline-flex items-center px-3 py-1.5 rounded-full bg-gray-100 dark:bg-gray-800 text-xs md:text-sm">
-              <span className="mr-1.5 md:mr-2">•</span>
-              <span className="font-medium">Tous les fan arts</span> 
-              <span className="text-gray-500 dark:text-gray-400 ml-1">— Collection vérifiée</span>
-            </div>
-            <div className="inline-flex items-center px-3 py-1.5 rounded-full bg-yellow-100 dark:bg-yellow-900/30 text-xs md:text-sm">
-              <span className="mr-1 text-yellow-500">★</span>
-              <span className="font-medium">Sélection premium</span>
-              <span className="text-gray-500 dark:text-gray-400 ml-1">— Choix de l'équipe</span>
-            </div>
-          </div>
         </div>
         
         <FanArtGallery />

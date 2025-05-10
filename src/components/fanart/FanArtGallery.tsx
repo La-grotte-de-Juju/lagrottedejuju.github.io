@@ -13,17 +13,11 @@ interface FanArt {
 }
 
 export default function FanArtGallery() {
-  // Pour les fan arts premium
-  const [premiumFanArts, setPremiumFanArts] = useState<FanArt[]>([]);
-  const [filteredPremiumFanArts, setFilteredPremiumFanArts] = useState<FanArt[]>([]);
-  const [loadingPremium, setLoadingPremium] = useState(true);
-  const [errorPremium, setErrorPremium] = useState<string | null>(null);
-  
-  // Pour les fan arts classiques
-  const [classicFanArts, setClassicFanArts] = useState<FanArt[]>([]);
-  const [filteredClassicFanArts, setFilteredClassicFanArts] = useState<FanArt[]>([]);
-  const [loadingClassic, setLoadingClassic] = useState(true);
-  const [errorClassic, setErrorClassic] = useState<string | null>(null);
+  // Pour les fan arts
+  const [fanArts, setFanArts] = useState<FanArt[]>([]);
+  const [filteredFanArts, setFilteredFanArts] = useState<FanArt[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   
   // États communs
   const [selectedFanArt, setSelectedFanArt] = useState<FanArt | null>(null);
@@ -32,18 +26,13 @@ export default function FanArtGallery() {
   const [searchQuery, setSearchQuery] = useState<string>('');
 
   // Fonction pour récupérer les fan arts avec useCallback
-  const fetchFanArts = useCallback(async (category: 'prime' | 'classic') => {
-    const setLoading = category === 'prime' ? setLoadingPremium : setLoadingClassic;
-    const setError = category === 'prime' ? setErrorPremium : setErrorClassic;
-    const setFanArts = category === 'prime' ? setPremiumFanArts : setClassicFanArts;
-    const setFilteredFanArts = category === 'prime' ? setFilteredPremiumFanArts : setFilteredClassicFanArts;
-    
+  const fetchFanArts = useCallback(async () => {
     setLoading(true);
     
     try {
       // Check local storage cache first
-      const cacheKey = `fanArtsCache-${category}`;
-      const timestampKey = `fanArtsCacheTimestamp-${category}`;
+      const cacheKey = 'fanArtsCache-classic';
+      const timestampKey = 'fanArtsCacheTimestamp-classic';
       const cachedData = localStorage.getItem(cacheKey);
       const cachedTimestamp = localStorage.getItem(timestampKey);
       const now = new Date().getTime();
@@ -59,7 +48,7 @@ export default function FanArtGallery() {
       
       // Otherwise fetch from API
       const response = await fetch(
-        `https://api.github.com/repos/La-grotte-de-Juju/La-grotte-de-Juju-Ressources/contents/Fanarts/${category}`,
+        `https://api.github.com/repos/La-grotte-de-Juju/La-grotte-de-Juju-Ressources/contents/Fanarts/classic`,
         {
           headers: {
             Accept: "application/vnd.github.v3+json",
@@ -94,23 +83,22 @@ export default function FanArtGallery() {
         localStorage.setItem(cacheKey, JSON.stringify(fanArtsWithUrls));
         localStorage.setItem(timestampKey, new Date().getTime().toString());
       } catch (e) {
-        console.warn(`Failed to cache ${category} fan arts data:`, e);
+        console.warn(`Failed to cache fan arts data:`, e);
       }
 
       setFanArts(fanArtsWithUrls);
       setFilteredFanArts(sortFanArts(fanArtsWithUrls, sortOrder));
     } catch (err) {
-      console.error(`Erreur lors de la récupération des fan arts ${category}:`, err);
-      setError(`Impossible de charger les fan arts ${category === 'prime' ? 'premium' : 'classiques'}. Veuillez réessayer plus tard.`);
+      console.error(`Erreur lors de la récupération des fan arts:`, err);
+      setError(`Impossible de charger les fan arts. Veuillez réessayer plus tard.`);
     } finally {
       setLoading(false);
     }
   }, [sortOrder]);
 
-  // Charger les deux catégories de fan arts au chargement
+  // Charger les fan arts au chargement
   useEffect(() => {
-    fetchFanArts('prime');
-    fetchFanArts('classic');
+    fetchFanArts();
   }, [fetchFanArts]);
 
   // Fonction pour trier les fan arts selon différents critères
@@ -130,10 +118,10 @@ export default function FanArtGallery() {
     }
   };
   
-  // Appliquer le tri et le filtrage lorsque le critère change pour les fan arts premium
+  // Appliquer le tri et le filtrage lorsque le critère change
   useEffect(() => {
-    if (premiumFanArts.length > 0) {
-      let results = [...premiumFanArts];
+    if (fanArts.length > 0) {
+      let results = [...fanArts];
       
       // Filtre par recherche si on a un terme de recherche
       if (searchQuery.trim()) {
@@ -146,31 +134,11 @@ export default function FanArtGallery() {
       // Trier les résultats
       results = sortFanArts(results, sortOrder);
       
-      setFilteredPremiumFanArts(results);
+      setFilteredFanArts(results);
     }
-  }, [sortOrder, premiumFanArts, searchQuery]);
+  }, [sortOrder, fanArts, searchQuery]);
 
-  // Appliquer le tri et le filtrage lorsque le critère change pour les fan arts classiques
-  useEffect(() => {
-    if (classicFanArts.length > 0) {
-      let results = [...classicFanArts];
-      
-      // Filtre par recherche si on a un terme de recherche
-      if (searchQuery.trim()) {
-        const query = searchQuery.trim().toLowerCase();
-        results = results.filter(art => 
-          art.name.toLowerCase().includes(query)
-        );
-      }
-      
-      // Trier les résultats
-      results = sortFanArts(results, sortOrder);
-      
-      setFilteredClassicFanArts(results);
-    }
-  }, [sortOrder, classicFanArts, searchQuery]);
-
-  const handleFanArtClick = (fanArt: FanArt, source?: 'premium' | 'classic') => {
+  const handleFanArtClick = (fanArt: FanArt) => {
     setSelectedFanArt(fanArt);
     setViewerOpen(true);
   };
@@ -200,10 +168,8 @@ export default function FanArtGallery() {
     };
   }, []);
   
-  // Pas besoin de l'effet de réinitialisation des filtres qui dépendait de category
-
-  // Affichage du chargement global si les deux sections sont en cours de chargement
-  if (loadingPremium && loadingClassic) {
+  // Affichage du chargement
+  if (loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[40vh] p-8">
         <img 
@@ -216,23 +182,22 @@ export default function FanArtGallery() {
     );
   }
 
-  // Affichage des erreurs si les deux parties ont échoué
-  if (errorPremium && errorClassic) {
+  // Affichage des erreurs
+  if (error) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[40vh] p-8 text-center">
         <ImageIcon className="h-16 w-16 text-red-500 mb-4" />
         <p className="text-xl font-medium mb-2">Oups! Une erreur est survenue</p>
         <p className="text-gray-600 dark:text-gray-400">
-          {errorPremium}<br />
-          {errorClassic}
+          {error}
         </p>
       </div>
     );
   }
 
   // Calcul du nombre total d'images affichées
-  const totalImages = filteredPremiumFanArts.length + filteredClassicFanArts.length;
-  const totalOriginalImages = premiumFanArts.length + classicFanArts.length;
+  const totalImages = filteredFanArts.length;
+  const totalOriginalImages = fanArts.length;
   
   return (
     <div className="flex flex-col md:flex-row gap-4">
@@ -292,13 +257,9 @@ export default function FanArtGallery() {
             {totalOriginalImages > 0 && (
               <div className="text-sm text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800/50 p-3 rounded-md">
                 <div className="font-medium mb-1">Statistiques</div>
-                <div className="flex justify-between">
-                  <span>Fan arts premium:</span>
-                  <span className="font-medium">{filteredPremiumFanArts.length}</span>
-                </div>
                 <div className="flex justify-between mt-1">
-                  <span>Fan arts standards:</span>
-                  <span className="font-medium">{filteredClassicFanArts.length}</span>
+                  <span>Fan arts:</span>
+                  <span className="font-medium">{filteredFanArts.length}</span>
                 </div>
                 <div className="border-t border-gray-200 dark:border-gray-700 my-2"></div>
                 <div className="flex justify-between">
@@ -382,106 +343,19 @@ export default function FanArtGallery() {
             </div>
           )}
         </div>
-        
-        {/* Section Fan Arts Premium */}
+
+      {/* Section Fan Arts */}
       <div className="mb-12">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between px-4 mb-4 gap-2">
-          <h2 className="text-2xl font-bold bg-gradient-to-r from-yellow-500 to-amber-400 bg-clip-text text-transparent flex items-center gap-2">
-            <span>Sélection Premium</span>
-            <span className="text-yellow-500">★</span>
-          </h2>
-          <div className="text-sm text-gray-500 dark:text-gray-400">
-            {filteredPremiumFanArts.length} œuvres
-          </div>
-        </div>
-        
-        {loadingPremium ? (
-          <div className="flex flex-col items-center justify-center p-8">
-            <img 
-              src="/images/JujuLoading.gif" 
-              alt="Chargement en cours" 
-              className="w-16 h-16 mb-2"
-            />
-            <p className="text-sm text-gray-500 dark:text-gray-400">Acquisition des images...</p>
-          </div>
-        ) : errorPremium ? (
-          <div className="bg-red-50 dark:bg-red-900/20 rounded-lg p-4 mx-4">
-            <p className="text-red-600 dark:text-red-400">{errorPremium}</p>
-          </div>
-        ) : filteredPremiumFanArts.length === 0 ? (
-          <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4 md:p-6 mx-2 md:mx-4 text-center">
-            <p className="text-gray-500 dark:text-gray-400 text-sm md:text-base">
-              {searchQuery ? (
-                <>Aucun Fan Art premium ne correspond à votre recherche.</>
-              ) : (
-                <>Aucun Fan Art premium disponible pour le moment.</>
-              )}
-            </p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6 p-3 md:p-4">
-            {filteredPremiumFanArts.map((fanArt, index) => (
-              <Card
-                key={fanArt.sha}
-                className="overflow-hidden hover:shadow-lg transition-all duration-300 hover:scale-[1.02] transform cursor-pointer group animate-fadeIn bg-yellow-50/20 dark:bg-yellow-900/10"
-                style={{ animationDelay: `${index * 100}ms` }}
-                onClick={() => handleFanArtClick(fanArt, 'premium')}
-              >
-                <div className="relative aspect-square overflow-hidden">
-                  {/* Loading indicator shown while the image is loading */}
-                  <div className="absolute inset-0 flex items-center justify-center bg-gray-100 dark:bg-gray-800 z-10 transition-opacity group-hover:opacity-0">
-                    <img 
-                      src="/images/JujuLoading.gif" 
-                      alt="Chargement" 
-                      className="w-12 h-12" 
-                    />
-                  </div>
-                  
-                  <img
-                    src={fanArt.download_url}
-                    alt={`Fan art premium: ${fanArt.name}`}
-                    className="w-full h-full object-cover transition-all duration-500 group-hover:scale-110"
-                    loading="lazy"
-                    onLoad={(e) => {
-                      // Hide loader when image loads
-                      const target = e.target as HTMLImageElement;
-                      const parent = target.parentElement;
-                      if (parent) {
-                        const loader = parent.querySelector('div');
-                        if (loader) loader.style.display = 'none';
-                      }
-                    }}
-                  />
-                  
-                  {/* Overlay that appears on hover */}
-                  <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                    <div className="p-2 bg-white/20 backdrop-blur-sm rounded-full">
-                      <ImageIcon className="h-6 w-6 text-white" />
-                    </div>
-                  </div>
-                </div>
-                <div className="p-2 md:p-3 bg-black/5 dark:bg-white/5 flex items-center justify-between">
-                  <h3 className="font-medium text-xs md:text-sm truncate">{fanArt.name.replace(/\.(jpg|jpeg|png|gif|webp)$/i, '')}</h3>
-                  <span className="text-yellow-500 text-xs flex-shrink-0 ml-1" title="Fan art premium">★</span>
-                </div>
-              </Card>
-            ))}
-          </div>
-        )}
-      </div>
-      
-      {/* Section Fan Arts Classiques */}
-      <div className="mt-8">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between px-4 mb-4 gap-2">
           <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">
-            Tous les Fan Arts
+            Fan Arts
           </h2>
           <div className="text-sm text-gray-500 dark:text-gray-400">
-            {filteredClassicFanArts.length} œuvres
+            {filteredFanArts.length} œuvres
           </div>
         </div>
         
-        {loadingClassic ? (
+        {loading ? (
           <div className="flex flex-col items-center justify-center p-8">
             <img 
               src="/images/JujuLoading.gif" 
@@ -490,15 +364,15 @@ export default function FanArtGallery() {
             />
             <p className="text-sm text-gray-500 dark:text-gray-400">Acquisition des images...</p>
           </div>
-        ) : errorClassic ? (
+        ) : error ? (
           <div className="bg-red-50 dark:bg-red-900/20 rounded-lg p-4 mx-4">
-            <p className="text-red-600 dark:text-red-400">{errorClassic}</p>
+            <p className="text-red-600 dark:text-red-400">{error}</p>
           </div>
-        ) : filteredClassicFanArts.length === 0 ? (
+        ) : filteredFanArts.length === 0 ? (
           <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4 md:p-6 mx-2 md:mx-4 text-center">
             <p className="text-gray-500 dark:text-gray-400 text-sm md:text-base">
               {searchQuery ? (
-                <>Aucun Fan Art classique ne correspond à votre recherche.</>
+                <>Aucun Fan Art ne correspond à votre recherche.</>
               ) : (
                 <>Aucun Fan Art disponible pour le moment.</>
               )}
@@ -506,12 +380,12 @@ export default function FanArtGallery() {
           </div>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6 p-3 md:p-4">
-            {filteredClassicFanArts.map((fanArt, index) => (
+            {filteredFanArts.map((fanArt, index) => (
               <Card
                 key={fanArt.sha}
                 className="overflow-hidden hover:shadow-lg transition-all duration-300 hover:scale-[1.02] transform cursor-pointer group animate-fadeIn"
                 style={{ animationDelay: `${index * 100}ms` }}
-                onClick={() => handleFanArtClick(fanArt, 'classic')}
+                onClick={() => handleFanArtClick(fanArt)}
               >
                 <div className="relative aspect-square overflow-hidden">
                   {/* Loading indicator shown while the image is loading */}
@@ -560,7 +434,7 @@ export default function FanArtGallery() {
         fanArt={selectedFanArt}
         isOpen={viewerOpen}
         onClose={handleCloseViewer}
-        allFanArts={[...filteredPremiumFanArts, ...filteredClassicFanArts]} // Combinaison des deux catégories
+        allFanArts={filteredFanArts}
       />
       </div>
     </div>
