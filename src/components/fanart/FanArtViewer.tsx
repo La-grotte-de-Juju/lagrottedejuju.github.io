@@ -46,7 +46,6 @@ export function FanArtViewer({ fanArt, isOpen, onClose, allFanArts = [] }: FanAr
   };
   
   const handleDownload = () => {
-    // Create a temporary link to download the image
     const link = document.createElement('a');
     link.href = fanArt.download_url;
     link.download = fanArt.name;
@@ -59,7 +58,6 @@ export function FanArtViewer({ fanArt, isOpen, onClose, allFanArts = [] }: FanAr
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-6xl w-[95vw] md:w-[90vw] lg:w-[80vw] h-[90vh] p-0 bg-black/70 backdrop-blur-2xl border border-white/10 rounded-3xl shadow-2xl overflow-hidden flex flex-col focus:outline-none">
         <div className="relative flex flex-col h-full w-full">
-          {/* Top Controls (Close, Download) */}
           <div className="absolute top-6 right-6 flex gap-4 z-50">
             <motion.button
               onClick={handleDownload}
@@ -81,7 +79,6 @@ export function FanArtViewer({ fanArt, isOpen, onClose, allFanArts = [] }: FanAr
             </motion.button>
           </div>
 
-          {/* Image Display Area with Navigation */}
           <div className="flex-grow relative flex items-center justify-center overflow-hidden pt-20 pb-24 px-6 md:px-10">
             {hasPrev && (
               <button
@@ -95,7 +92,7 @@ export function FanArtViewer({ fanArt, isOpen, onClose, allFanArts = [] }: FanAr
             
             <AnimatePresence mode="wait">
               <motion.img
-                key={fanArt.download_url} // Important for AnimatePresence to detect changes
+                key={fanArt.download_url} 
                 src={fanArt.download_url}
                 alt={`Fan art: ${fanArt.name}`}
                 className="max-h-full max-w-full object-contain select-none shadow-2xl rounded-lg" 
@@ -117,7 +114,6 @@ export function FanArtViewer({ fanArt, isOpen, onClose, allFanArts = [] }: FanAr
             )}
           </div>
           
-          {/* Info Bar */}
           <motion.div 
             className="absolute bottom-6 left-6 right-6 px-4 py-3 bg-black/50 backdrop-blur-xl text-gray-100 flex justify-between items-center shadow-2xl rounded-2xl"
             initial={{ opacity: 0, y: 20 }}

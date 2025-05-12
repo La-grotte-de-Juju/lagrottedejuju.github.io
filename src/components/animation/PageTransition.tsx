@@ -6,7 +6,7 @@ import { ReactNode } from "react";
 
 interface PageTransitionProps {
   children: ReactNode;
-  blurIntensity?: number; // Nouvelle propriété pour contrôler l'intensité du flou
+  blurIntensity?: number; 
 }
 
 const variants = {
@@ -15,7 +15,7 @@ const variants = {
     y: "20%",
     rotateX: -15,
     scale: 0.95,
-    filter: "blur(16px)", // Augmenté pour un effet plus prononcé
+    filter: "blur(16px)", 
     borderRadius: "30px",
   },
   animate: {
@@ -31,7 +31,7 @@ const variants = {
     y: "-20%",
     rotateX: 15,
     scale: 0.95,
-    filter: "blur(16px)", // Augmenté pour un effet plus prononcé
+    filter: "blur(16px)", 
     borderRadius: "30px",
   },
 };
@@ -45,7 +45,7 @@ const springTransition = {
 export default function PageTransition({ children, blurIntensity = 16 }: PageTransitionProps) {
   const pathname = usePathname();
 
-  // Variants personnalisés avec l'intensité de flou paramétrable
+  
   const customVariants = {
     initial: {
       ...variants.initial,

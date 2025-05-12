@@ -1,7 +1,6 @@
 import { useState, useEffect, RefObject } from 'react';
 
-// Un hook personnalisé qui utilise l'Intersection Observer API pour détecter
-// quand un élément devient visible dans la fenêtre
+
 export function useIntersectionObserver(
   elementRef: RefObject<Element>,
   options: {
@@ -9,9 +8,9 @@ export function useIntersectionObserver(
     rootMargin?: string;
     threshold?: number;
   } = {
-    root: null, // viewport par défaut
+    root: null, 
     rootMargin: '0px',
-    threshold: 0.1, // 10% de l'élément doit être visible
+    threshold: 0.1, 
   }
 ): boolean {
   const [isIntersecting, setIsIntersecting] = useState(false);

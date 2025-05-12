@@ -29,9 +29,9 @@ export const metadata: Metadata = {
     description: "Ici, tu pourras rester au courant des nouveautés de la chaîne, qu'il s'agisse des dernières vidéos, des créations en cours ou de l'univers qui prend forme peu à peu ! Tu auras même la chance de lire des bandes dessinées mettant en scène tes personnages préférés.",
     images: [
       {
-        url: "/images/headerfullresV1.webp", // Changed image
-        width: 1200, // Assuming original width, adjust if necessary
-        height: 630, // Assuming original height, adjust if necessary
+        url: "/images/headerfullresV1.webp",
+        width: 1200,
+        height: 630,
         alt: "La Grotte de Juju",
       }
     ],
@@ -41,7 +41,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "La Grotte de Juju",
     description: "Ici, tu pourras rester au courant des nouveautés de la chaîne, qu'il s'agisse des dernières vidéos, des créations en cours ou de l'univers qui prend forme peu à peu ! Tu auras même la chance de lire des bandes dessinées mettant en scène tes personnages préférés.",
-    images: ["/images/headerfullresV1.webp"], // Changed image
+    images: ["/images/headerfullresV1.webp"],
   },
 };
 
