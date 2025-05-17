@@ -16,7 +16,7 @@ const initialLinks = [
 	},
 	{
 		name: "Tipeee",
-		url: "https://fr.tipeee.com/la-grotte-dejuju",
+		url: "https://fr.tipeee.com/la-grotte-de-juju",
 		icon: <LinkIcon className="h-8 w-8" />,
 		color: "bg-emerald-500",
 		gradient: "from-emerald-400 to-emerald-600",
