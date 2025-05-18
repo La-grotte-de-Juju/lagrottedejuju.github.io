@@ -9,10 +9,11 @@ permissions:
   contents: read
   pages: write
   id-token: write
+  actions: read
 
 concurrency:
   group: "pages"
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   build:
@@ -32,13 +33,11 @@ jobs:
       - name: Create .nojekyll file
         run: touch ./out/.nojekyll
       - name: Copy CNAME file
-        run: cp ./CNAME ./out/
-      - name: Upload artifact
+        run: cp ./CNAME ./out/      - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          name: github-pages
           path: ./out
-
+          retention-days: 1
   deploy:
     environment:
       name: github-pages
@@ -49,3 +48,5 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v3
+        with:
+          artifact_name: github-pages
