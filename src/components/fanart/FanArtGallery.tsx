@@ -173,107 +173,130 @@ export default function FanArtGallery() {
   const [sortOrder, setSortOrder] = useState<'newest' | 'oldest' | 'alphabetical'>('newest');
   const [searchQuery, setSearchQuery] = useState<string>('');
 
+  const sortFanArts = useCallback((arts: FanArt[], order: typeof sortOrder): FanArt[] => {
+    return [...arts].sort((a, b) => {
+      if (order === 'newest') {
+        return new Date(b.commitDate || 0).getTime() - new Date(a.commitDate || 0).getTime();
+      }
+      if (order === 'oldest') {
+        return new Date(a.commitDate || 0).getTime() - new Date(b.commitDate || 0).getTime();
+      }
+      if (order === 'alphabetical') {
+        return a.name.localeCompare(b.name);
+      }
+      return 0;
+    });
+  }, []);
+
   const fetchFanArts = useCallback(async (forceRefresh = false) => {
     setLoading(true);
     if (forceRefresh) setRefreshing(true);
     
-    try {
-      const cacheKey = 'fanArtsCache-classic-v2'; // Cache key updated for new structure
-      const timestampKey = 'fanArtsCacheTimestamp-classic-v2';
-      const lastCommitDateKey = 'fanArtsLastCommitDate-classic-v2';
+    const cacheKey = 'fanArtsCache-classic-v2'; 
+    const timestampKey = 'fanArtsCacheTimestamp-classic-v2';
+    const lastCommitDateKey = 'fanArtsLastCommitDate-classic-v2';
 
+    try {
       const cachedData = localStorage.getItem(cacheKey);
       const cachedTimestamp = localStorage.getItem(timestampKey);
       const cachedLastCommitDate = localStorage.getItem(lastCommitDateKey);
       const now = new Date().getTime();
       
       if (!forceRefresh && cachedData && cachedTimestamp && cachedLastCommitDate && now - parseInt(cachedTimestamp) < 30 * 60 * 1000) {
-        const parsedData = JSON.parse(cachedData) as FanArt[]; // Ensure type
+        const parsedData = JSON.parse(cachedData) as FanArt[];
         const sizedFanArts = assignRandomSizesToFanArts(parsedData);
         setFanArts(sizedFanArts);
         setFilteredFanArts(sortFanArts(sizedFanArts, sortOrder));
         setLastUpdated(new Date(cachedLastCommitDate).toLocaleString());
         setLoading(false);
+        setRefreshing(false);
         return;
       }
       
       setRefreshing(true);
 
-      const response = await fetch(
-        `https://api.github.com/repos/La-grotte-de-Juju/La-grotte-de-Juju-Ressources/contents/Fanarts/classic`,
-        {
-          headers: {
-            Accept: "application/vnd.github.v3+json",
-          },
-          cache: "no-store",
-        }
-      );
-
+      const response = await fetch('https://api.github.com/repos/lagrottedejuju/website-images/contents/FanArts-Classics?ref=main');
+      
       if (!response.ok) {
-        throw new Error(`Erreur lors de la récupération des fan arts: ${response.statusText}`);
+        let errorBody = "Unknown error details";
+        try {
+          errorBody = await response.text(); 
+        } catch (e) { /* ignore if can't read body */ }
+        console.error(`GitHub API error: ${response.status} - ${response.statusText}. Body: ${errorBody}`);
+        if (response.status === 403) {
+          throw new Error("Erreur 403: Accès refusé par l'API GitHub. Cela est souvent dû à des limitations de débit pour les requêtes non authentifiées. Veuillez réessayer plus tard. Les détails techniques sont dans la console.");
+        }
+        throw new Error(`L'API GitHub a retourné une erreur ${response.status}. Les détails ont été enregistrés dans la console.`);
       }
 
-      const data = await response.json();
-      
-      const imageExtensions = [".jpg", ".jpeg", ".png", ".gif", ".webp"];
-      const imageFiles = data.filter((item: {type: string; name: string}) =>
-        item.type === "file" &&
-        imageExtensions.some(ext => item.name.toLowerCase().endsWith(ext))
+      const rawData = await response.json();
+
+      if (!Array.isArray(rawData)) {
+        console.error("GitHub API did not return an array for FanArts-Classics. Received:", rawData);
+        throw new Error("Format de données incorrect reçu de l'API GitHub (attendu un tableau).");
+      }
+
+      const fanArtItems = rawData.filter((item: any) => 
+        item.type === 'file' && 
+        /\.(jpg|jpeg|png|gif|webp)$/i.test(item.name)
       );
 
-      const fanArtPromises = imageFiles.map(async (file: {name: string; download_url: string; path: string; sha: string}) => {
-        let fileCommitDate: string | undefined = undefined;
+      const fanArtsWithDatesPromises = fanArtItems.map(async (item: any) => {
         try {
-          const commitInfoResponse = await fetch(
-            `https://api.github.com/repos/La-grotte-de-Juju/La-grotte-de-Juju-Ressources/commits?path=${encodeURIComponent(file.path)}&page=1&per_page=1`,
-            {
-              headers: { Accept: "application/vnd.github.v3+json" },
-            }
-          );
-          if (commitInfoResponse.ok) {
-            const commitData = await commitInfoResponse.json();
-            if (commitData && commitData.length > 0 && commitData[0].commit && commitData[0].commit.committer) {
-              fileCommitDate = commitData[0].commit.committer.date;
-            }
-          } else {
-            console.warn(`Failed to fetch commit date for ${file.name}: ${commitInfoResponse.statusText}`);
+          const commitResponse = await fetch(`https://api.github.com/repos/lagrottedejuju/website-images/commits?path=${encodeURIComponent(item.path)}&page=1&per_page=1&ref=main`);
+          if (!commitResponse.ok) {
+            console.warn(`Impossible de récupérer la date de commit pour ${item.path}: ${commitResponse.status}`);
+            return { ...item, download_url: item.download_url, commitDate: new Date(0).toISOString() };
           }
-        } catch (error) {
-          console.warn(`Error fetching commit date for ${file.name}:`, error);
+          const commitData = await commitResponse.json();
+          const commitDate = (Array.isArray(commitData) && commitData.length > 0 && commitData[0]?.commit?.committer?.date) 
+                           ? commitData[0].commit.committer.date 
+                           : new Date(0).toISOString();
+          return { ...item, download_url: item.download_url, commitDate };
+        } catch (commitError) {
+          console.warn(`Erreur lors de la récupération de la date de commit pour ${item.path}:`, commitError);
+          return { ...item, download_url: item.download_url, commitDate: new Date(0).toISOString() };
         }
-        return {
-          name: file.name,
-          download_url: file.download_url,
-          path: file.path,
-          sha: file.sha,
-          commitDate: fileCommitDate,
-        };
       });
-
-      const fanArtsWithDates = await Promise.all(fanArtPromises);
       
-      const optimizedFanArts = assignOptimizedSizesToFanArts(fanArtsWithDates);
+      const fanArtsWithDates = await Promise.all(fanArtsWithDatesPromises);
+      
+      const latestCommitDate = fanArtsWithDates.reduce((latest, art) => {
+        const artDate = new Date(art.commitDate || 0);
+        return artDate > latest ? artDate : latest;
+      }, new Date(0));
+      
+      const sizedFanArts = assignRandomSizesToFanArts(fanArtsWithDates);
+      const sortedAndSizedFanArts = sortFanArts(sizedFanArts, sortOrder);
 
-      try {
-        localStorage.setItem(cacheKey, JSON.stringify(fanArtsWithDates)); // Store fanarts with dates
-        const timestamp = new Date().getTime();
-        localStorage.setItem(timestampKey, timestamp.toString());
-        localStorage.setItem(lastCommitDateKey, new Date().toISOString());
-        setLastUpdated(new Date().toLocaleString());
-      } catch (e) {
-        console.warn(`Failed to cache fan arts data:`, e);
+      setFanArts(sortedAndSizedFanArts);
+      setFilteredFanArts(sortedAndSizedFanArts);
+      setLastUpdated(latestCommitDate.toLocaleString());
+
+      localStorage.setItem(cacheKey, JSON.stringify(fanArtsWithDates));
+      localStorage.setItem(timestampKey, new Date().getTime().toString());
+      localStorage.setItem(lastCommitDateKey, latestCommitDate.toISOString());
+
+    } catch (err: any) { 
+      console.error("Échec de la récupération des fan arts:", err);
+      let displayError = "Oups! Une erreur est survenue\n\nImpossible de charger les fan arts. Veuillez réessayer plus tard.";
+      if (err && err.message) {
+         if (err.message.includes("L'API GitHub a retourné une erreur") || 
+             err.message.includes("Format de données incorrect") ||
+             err.message.includes("Erreur 403: Accès refusé par l'API GitHub")) { // Ensure the new specific message is caught
+             displayError = err.message;
+         }
       }
-
-      setFanArts(optimizedFanArts);
-      setFilteredFanArts(sortFanArts(optimizedFanArts, sortOrder));
-    } catch (err) {
-      console.error(`Erreur lors de la récupération des fan arts:`, err);
-      setError(`Impossible de charger les fan arts. Veuillez réessayer plus tard.`);
+      setError(displayError);
+      
+      localStorage.removeItem(cacheKey);
+      localStorage.removeItem(timestampKey);
+      localStorage.removeItem(lastCommitDateKey);
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
-  }, [sortOrder]);
+  }, [sortOrder, sortFanArts]);
 
   const handleRefresh = () => {
     fetchFanArts(true);
@@ -307,55 +330,15 @@ export default function FanArtGallery() {
     }
   }, [loading, filteredFanArts, visibleCount, isSearchMode, isGalleryVisible, loadImagesProgressively, visibleItems.length]);
 
-  const sortFanArts = (arts: FanArt[], order: 'newest' | 'oldest' | 'alphabetical'): FanArt[] => {
-    const sorted = [...arts];
-    // Fallback dates for sorting items where commitDate might be missing
-    const fallbackDateEpoch = new Date(0).getTime(); // Very old date
-    const fallbackDateFuture = new Date(8640000000000000).getTime(); // Very far future date
-
-    switch (order) {
-      case 'alphabetical':
-        return sorted.sort((a, b) => a.name.localeCompare(b.name));
-      case 'newest':
-        return sorted.sort((a, b) => {
-          const timeA = a.commitDate ? new Date(a.commitDate).getTime() : fallbackDateEpoch;
-          const timeB = b.commitDate ? new Date(b.commitDate).getTime() : fallbackDateEpoch;
-          if (timeB === timeA) {
-            return a.name.localeCompare(b.name); // Stabilize with name if dates are same or both are fallbacks
-          }
-          return timeB - timeA; // Newest first
-        });
-      case 'oldest':
-        return sorted.sort((a, b) => {
-          const timeA = a.commitDate ? new Date(a.commitDate).getTime() : fallbackDateFuture;
-          const timeB = b.commitDate ? new Date(b.commitDate).getTime() : fallbackDateFuture;
-          if (timeA === timeB) {
-            return a.name.localeCompare(b.name); // Stabilize with name
-          }
-          return timeA - timeB; // Oldest first
-        });
-      default:
-        return sorted;
-    }
-  };
-  
   useEffect(() => {
-    if (fanArts.length > 0) {
-      let results = [...fanArts];
-      if (searchQuery.trim()) {
-        const query = searchQuery.trim().toLowerCase();
-        results = results.filter(art => 
-          art.name.toLowerCase().includes(query)
-        );
-        setIsSearchMode(true);
-      } else {
-        setIsSearchMode(false);
-        setVisibleCount(ITEMS_PER_PAGE);
-      }
-      results = sortFanArts(results, sortOrder);
-      setFilteredFanArts(results);
-    }
-  }, [sortOrder, fanArts, searchQuery, ITEMS_PER_PAGE]);
+    const sorted = sortFanArts(fanArts, sortOrder);
+    const filtered = sorted.filter(art => 
+      art.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    setFilteredFanArts(filtered);
+    setVisibleCount(ITEMS_PER_PAGE); 
+    setIsSearchMode(searchQuery !== '');
+  }, [searchQuery, sortOrder, fanArts, sortFanArts, ITEMS_PER_PAGE]);
 
   const handleFanArtClick = (fanArt: FanArt) => {
     setSelectedFanArt(fanArt);
@@ -834,12 +817,14 @@ export default function FanArtGallery() {
           )}
         </div>
       </div>
-      <FanArtViewer
-        fanArt={selectedFanArt}
-        isOpen={viewerOpen}
-        onClose={handleCloseViewer}
-        allFanArts={filteredFanArts}
-      />
+      {viewerOpen && selectedFanArt && (
+        <FanArtViewer
+          fanArt={selectedFanArt}
+          isOpen={viewerOpen}
+          onClose={handleCloseViewer}
+          allFanArts={filteredFanArts}
+        />
+      )}
     </div>
   );
 }
