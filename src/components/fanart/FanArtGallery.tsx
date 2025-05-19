@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { Card } from "../ui/card";
-import { ImageIcon, Loader2, X, Search, RefreshCw, AlertTriangle } from "lucide-react";
+import { ImageIcon, Loader2, X, Search, RefreshCw, AlertTriangle, Leaf, XCircle, Trash2 } from "lucide-react";
 import { FanArtViewer } from "./FanArtViewer";
 import { useIntersectionObserver } from "./useIntersectionObserver";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "../ui/dialog";
@@ -186,6 +186,7 @@ export default function FanArtGallery() {
   const [viewerOpen, setViewerOpen] = useState(false);
   const [sortOrder, setSortOrder] = useState<'newest' | 'oldest' | 'alphabetical'>('newest');
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [showClearCacheConfirmDialog, setShowClearCacheConfirmDialog] = useState(false);
 
   const sortFanArts = useCallback((arts: FanArt[], order: typeof sortOrder): FanArt[] => {
     return [...arts].sort((a, b) => {
@@ -319,6 +320,22 @@ export default function FanArtGallery() {
     const resizedFanArts = assignRandomSizesToFanArts([...fanArts]);
     setFanArts(resizedFanArts);
     setFilteredFanArts(sortFanArts(resizedFanArts, sortOrder));
+  };
+
+  const handleClearCache = () => {
+    setShowClearCacheConfirmDialog(true);
+  };
+
+  const confirmClearCache = () => {
+    setShowClearCacheConfirmDialog(false);
+    const cacheBuster = `?cacheBust=${new Date().getTime()}`;
+
+    setFanArts(prevFanArts =>
+      prevFanArts.map(art => ({
+        ...art,
+        download_url: art.download_url.split('?')[0] + cacheBuster,
+      }))
+    );
   };
 
   const galleryRef = useRef<HTMLDivElement>(null);
@@ -518,6 +535,13 @@ export default function FanArtGallery() {
               <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
               {refreshing ? 'Mise à jour...' : 'Rafraîchir les images'}
             </button>
+            <button
+              onClick={handleClearCache}
+              className="w-full py-2 px-3 flex items-center justify-center gap-2 text-sm font-medium rounded-md bg-yellow-100 hover:bg-yellow-200 dark:bg-yellow-900/30 dark:hover:bg-yellow-800/40 text-yellow-600 dark:text-yellow-300 hover:text-yellow-700"
+            >
+              <AlertTriangle className="h-4 w-4" />
+              Vider le cache des images
+            </button>
           </div>
         </div>
       </div>
@@ -575,6 +599,13 @@ export default function FanArtGallery() {
           >
             <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
             {refreshing ? 'Mise à jour...' : 'Rafraîchir les images'}
+          </button>
+          <button
+            onClick={handleClearCache}
+            className="w-full py-2 px-3 flex items-center justify-center gap-2 text-sm font-medium rounded-md bg-yellow-100 hover:bg-yellow-200 dark:bg-yellow-900/30 dark:hover:bg-yellow-800/40 text-yellow-600 dark:text-yellow-300 hover:text-yellow-700"
+          >
+            <AlertTriangle className="h-4 w-4" />
+            Vider le cache des images
           </button>
           {totalOriginalImages > 0 && (
             <div className="text-sm text-gray-500 dark:text-gray-400">
@@ -832,6 +863,60 @@ export default function FanArtGallery() {
           )}
         </div>
       </div>
+      <Dialog open={showClearCacheConfirmDialog} onOpenChange={setShowClearCacheConfirmDialog}>
+        <DialogContent className="sm:max-w-lg bg-white dark:bg-gray-800 rounded-lg shadow-xl p-0">
+          <DialogHeader className="p-6 pb-2 border-b border-gray-200 dark:border-gray-700">
+        <DialogTitle className="text-xl font-semibold text-gray-900 dark:text-white flex items-center gap-3">
+          <AlertTriangle className="h-6 w-6 text-yellow-500" />
+          Vider le cache des images ?
+        </DialogTitle>
+          </DialogHeader>
+
+          <div className="p-6 pt-3 space-y-4">
+        <DialogDescription className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
+          Cette action forcera ton navigateur à re-télécharger toutes les images de la galerie. Cela peut entraîner une consommation importante de données sur ta connexion internet.
+          Nous te recommandons de l'utiliser uniquement si certains fan arts ne s'affichent pas.
+        </DialogDescription>
+        
+        <div className="p-4 rounded-md bg-orange-50 dark:bg-orange-900/40 border border-orange-200 dark:border-orange-700/60">
+          <div className="flex items-start">
+            <AlertTriangle className="h-5 w-5 text-orange-500 dark:text-orange-400 mr-3 mt-0.5 flex-shrink-0" />
+            <p className="text-sm text-orange-700 dark:text-orange-300 leading-relaxed">
+          <span className="font-semibold">Attention :</span> Pour éviter une surcharge de l'API et un éventuel blocage temporaire de l'accès aux fanarts, veuillez ne pas utiliser cette fonction de manière répétée et excessive.
+            </p>
+          </div>
+        </div>
+
+        <div className="p-4 rounded-md bg-green-50 dark:bg-green-900/40 border border-green-200 dark:border-green-700/60">
+          <div className="flex items-start">
+            <Leaf className="h-5 w-5 text-green-600 dark:text-green-400 mr-3 mt-0.5 flex-shrink-0" />
+            <p className="text-sm text-green-700 dark:text-green-300 leading-relaxed">
+          <span className="font-semibold">Éco :</span> Conserver le cache des images contribue à réduire la consommation de données et d'énergie, car les images ne sont pas re-téléchargées à chaque visite.
+            </p>
+          </div>
+        </div>
+          </div>
+          
+          <DialogFooter className="px-6 py-4 bg-gray-50 dark:bg-gray-800/50 rounded-b-lg flex flex-col sm:flex-row sm:justify-end gap-3 border-t border-gray-200 dark:border-gray-700">
+        <Button 
+          variant="outline" 
+          onClick={() => setShowClearCacheConfirmDialog(false)} 
+          className="w-full sm:w-auto dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700 flex items-center justify-center gap-2"
+        >
+          <XCircle className="h-4 w-4" />
+          Annuler
+        </Button>
+        <Button 
+          variant="destructive" 
+          onClick={confirmClearCache} 
+          className="w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white flex items-center justify-center gap-2"
+        >
+          <Trash2 className="h-4 w-4" />
+          Confirmer et Vider
+        </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
       {viewerOpen && selectedFanArt && (
         <FanArtViewer
           fanArt={selectedFanArt}
@@ -840,6 +925,6 @@ export default function FanArtGallery() {
           allFanArts={filteredFanArts}
         />
       )}
-    </div>
-  );
-}
+        </div>
+      );
+    }
