@@ -175,7 +175,7 @@ export default function FanArtGallery() {
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
-  const ITEMS_PER_PAGE = 12;
+  const ITEMS_PER_PAGE = 10;
   const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
   const [isSearchMode, setIsSearchMode] = useState(false);
   const [showLoadAllWarning, setShowLoadAllWarning] = useState(false);
@@ -206,9 +206,9 @@ export default function FanArtGallery() {
     setLoading(true);
     if (forceRefresh) setRefreshing(true);
     
-    const cacheKey = 'fanArtsCache-classic-v2'; 
-    const timestampKey = 'fanArtsCacheTimestamp-classic-v2';
-    const lastCommitDateKey = 'fanArtsLastCommitDate-classic-v2';
+    const cacheKey = 'fanArtsCache-ressources-classic-v1'; 
+    const timestampKey = 'fanArtsCacheTimestamp-ressources-classic-v1';
+    const lastCommitDateKey = 'fanArtsLastCommitDate-ressources-classic-v1';
 
     try {
       const cachedData = localStorage.getItem(cacheKey);
@@ -229,7 +229,7 @@ export default function FanArtGallery() {
       
       setRefreshing(true);
 
-      const response = await fetch('https://api.github.com/repos/lagrottedejuju/website-images/contents/FanArts-Classics?ref=main');
+      const response = await fetch('https://api.github.com/repos/La-grotte-de-Juju/La-grotte-de-Juju-Ressources/contents/Fanarts/classic?ref=main');
       
       if (!response.ok) {
         let errorBody = "Unknown error details";
@@ -246,7 +246,7 @@ export default function FanArtGallery() {
       const rawData = await response.json();
 
       if (!Array.isArray(rawData)) {
-        console.error("GitHub API did not return an array for FanArts-Classics. Received:", rawData);
+        console.error("GitHub API did not return an array for Fanarts. Received:", rawData);
         throw new Error("Format de données incorrect reçu de l'API GitHub (attendu un tableau).");
       }
 
@@ -258,7 +258,7 @@ export default function FanArtGallery() {
 
       const fanArtsWithDatesPromises = fanArtItems.map(async (item: GitHubFile) => {
         try {
-          const commitResponse = await fetch(`https://api.github.com/repos/lagrottedejuju/website-images/commits?path=${encodeURIComponent(item.path)}&page=1&per_page=1&ref=main`);
+          const commitResponse = await fetch(`https://api.github.com/repos/La-grotte-de-Juju/La-grotte-de-Juju-Ressources/commits?path=${encodeURIComponent(item.path)}&page=1&per_page=1&ref=main`);
           if (!commitResponse.ok) {
             console.warn(`Impossible de récupérer la date de commit pour ${item.path}: ${commitResponse.status}`);
             return { ...item, download_url: item.download_url, commitDate: new Date(0).toISOString() };
@@ -778,7 +778,7 @@ export default function FanArtGallery() {
                     className="py-2 px-4 flex items-center justify-center gap-2 text-sm font-medium rounded-md bg-purple-100 hover:bg-purple-200 dark:bg-purple-900/30 dark:hover:bg-purple-800/40 text-purple-600 dark:text-purple-300 hover:text-purple-700 transition-all duration-200"
                   >
                     <RefreshCw className="h-4 w-4" />
-                    Charger 12 images de plus ({Math.min(ITEMS_PER_PAGE, filteredFanArts.length - visibleCount)} sur {filteredFanArts.length - visibleCount})
+                    Charger 10 images de plus ({Math.min(ITEMS_PER_PAGE, filteredFanArts.length - visibleCount)} sur {filteredFanArts.length - visibleCount})
                   </button>
                   <button
                     onClick={showLoadAllWarningModal}
