@@ -13,17 +13,14 @@ interface FanArt {
   download_url: string;
   path: string;
   sha: string;
+  commitDate?: string; // Added to store the commit date
   size?: 'small' | 'medium' | 'large' | 'tall' | 'wide';
   zoomFactor?: string; 
   borderRadius?: string; 
 }
 
-
 const generateRandomSize = (): 'small' | 'medium' | 'large' | 'tall' | 'wide' => {
-  
-  
   const rand = Math.random() * 100;
-  
   if (rand < 40) return 'small';
   if (rand < 70) return 'medium';
   if (rand < 80) return 'large';
@@ -31,16 +28,12 @@ const generateRandomSize = (): 'small' | 'medium' | 'large' | 'tall' | 'wide' =>
   return 'wide';
 };
 
-
 const generateRandomZoomFactor = (): string => {
-  
   const factor = 100 + Math.floor(Math.random() * 20);
   return `${factor}%`;
 };
 
-
 const FIXED_BORDER_RADIUS = '1rem';
-
 
 interface GridPosition {
   row: number;
@@ -52,31 +45,23 @@ interface GridCell {
   fanArtIndex?: number; 
 }
 
-
 const createGrid = (rows: number, cols: number): GridCell[][] => {
   const grid: GridCell[][] = [];
-  
   for (let i = 0; i < rows; i++) {
     grid[i] = [];
     for (let j = 0; j < cols; j++) {
       grid[i][j] = { isOccupied: false };
     }
   }
-  
   return grid;
 };
-
 
 const isPositionAvailable = (grid: GridCell[][], row: number, col: number, rowSpan: number, colSpan: number): boolean => {
   const gridRows = grid.length;
   const gridCols = grid[0].length;
-  
-  
   if (row + rowSpan > gridRows || col + colSpan > gridCols) {
     return false;
   }
-  
-  
   for (let i = row; i < row + rowSpan; i++) {
     for (let j = col; j < col + colSpan; j++) {
       if (grid[i][j].isOccupied) {
@@ -84,10 +69,8 @@ const isPositionAvailable = (grid: GridCell[][], row: number, col: number, rowSp
       }
     }
   }
-  
   return true;
 };
-
 
 const markPositionOccupied = (grid: GridCell[][], row: number, col: number, rowSpan: number, colSpan: number, fanArtIndex: number): void => {
   for (let i = row; i < row + rowSpan; i++) {
@@ -100,16 +83,10 @@ const markPositionOccupied = (grid: GridCell[][], row: number, col: number, rowS
   }
 };
 
-
 const assignOptimizedSizesToFanArts = (fanArts: FanArt[]): FanArt[] => {
-  
   const GRID_ROWS = 30; 
   const GRID_COLS = 6;  
-  
-  
   const grid = createGrid(GRID_ROWS, GRID_COLS);
-  
-  
   const sizeDimensions = {
     'small': { rowSpan: 1, colSpan: 1 },
     'medium': { rowSpan: 1, colSpan: 2 },
@@ -117,22 +94,13 @@ const assignOptimizedSizesToFanArts = (fanArts: FanArt[]): FanArt[] => {
     'tall': { rowSpan: 2, colSpan: 2 },
     'wide': { rowSpan: 1, colSpan: 3 }
   };
-  
-  
   const result = [...fanArts];
-  
-  
   for (let fanArtIndex = 0; fanArtIndex < fanArts.length; fanArtIndex++) {
     let placed = false;
-    
-    
     outer: for (let row = 0; row < GRID_ROWS; row++) {
       for (let col = 0; col < GRID_COLS; col++) {
         if (!grid[row][col].isOccupied) {
-          
           const sizesToTry: ('small' | 'medium' | 'large' | 'tall' | 'wide')[] = [];
-          
-          
           if (col >= GRID_COLS - 2) {
             sizesToTry.push('small');
             sizesToTry.push('medium');
@@ -140,9 +108,7 @@ const assignOptimizedSizesToFanArts = (fanArts: FanArt[]): FanArt[] => {
             sizesToTry.push('tall');
             sizesToTry.push('wide');
           } else {
-            
             const rand = Math.random() * 100;
-            
             if (rand < 40) {
               sizesToTry.push('small', 'medium', 'large', 'tall', 'wide');
             } else if (rand < 70) {
@@ -155,20 +121,15 @@ const assignOptimizedSizesToFanArts = (fanArts: FanArt[]): FanArt[] => {
               sizesToTry.push('wide', 'medium', 'small', 'large', 'tall');
             }
           }
-          
-          
           for (const size of sizesToTry) {
             const { rowSpan, colSpan } = sizeDimensions[size];
-            
             if (isPositionAvailable(grid, row, col, rowSpan, colSpan)) {
-              
               result[fanArtIndex] = {
                 ...result[fanArtIndex],
                 size: size,
                 zoomFactor: generateRandomZoomFactor(),
                 borderRadius: FIXED_BORDER_RADIUS
               };
-              
               markPositionOccupied(grid, row, col, rowSpan, colSpan, fanArtIndex);
               placed = true;
               break outer;
@@ -177,8 +138,6 @@ const assignOptimizedSizesToFanArts = (fanArts: FanArt[]): FanArt[] => {
         }
       }
     }
-    
-    
     if (!placed) {
       result[fanArtIndex] = {
         ...result[fanArtIndex],
@@ -188,70 +147,58 @@ const assignOptimizedSizesToFanArts = (fanArts: FanArt[]): FanArt[] => {
       };
     }
   }
-  
   return result;
 };
 
-
 const assignRandomSizesToFanArts = (fanArts: FanArt[]): FanArt[] => {
-  
   return assignOptimizedSizesToFanArts(fanArts);
 };
 
 export default function FanArtGallery() {
-  
   const [fanArts, setFanArts] = useState<FanArt[]>([]);
   const [filteredFanArts, setFilteredFanArts] = useState<FanArt[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
-  
-  
   const ITEMS_PER_PAGE = 12;
   const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
   const [isSearchMode, setIsSearchMode] = useState(false);
   const [showLoadAllWarning, setShowLoadAllWarning] = useState(false);
-  
-  
   const [visibleItems, setVisibleItems] = useState<number[]>([]);
   const [imagesLoaded, setImagesLoaded] = useState<Record<string, boolean>>({});
   const ANIMATION_DELAY_MS = 100; 
-  
-  
   const [selectedFanArt, setSelectedFanArt] = useState<FanArt | null>(null);
   const [viewerOpen, setViewerOpen] = useState(false);
   const [sortOrder, setSortOrder] = useState<'newest' | 'oldest' | 'alphabetical'>('newest');
   const [searchQuery, setSearchQuery] = useState<string>('');
 
-  
   const fetchFanArts = useCallback(async (forceRefresh = false) => {
     setLoading(true);
     if (forceRefresh) setRefreshing(true);
     
     try {
-      
-      const cacheKey = 'fanArtsCache-classic';
-      const timestampKey = 'fanArtsCacheTimestamp-classic';
+      const cacheKey = 'fanArtsCache-classic-v2'; // Cache key updated for new structure
+      const timestampKey = 'fanArtsCacheTimestamp-classic-v2';
+      const lastCommitDateKey = 'fanArtsLastCommitDate-classic-v2';
+
       const cachedData = localStorage.getItem(cacheKey);
       const cachedTimestamp = localStorage.getItem(timestampKey);
+      const cachedLastCommitDate = localStorage.getItem(lastCommitDateKey);
       const now = new Date().getTime();
       
-      
-      if (!forceRefresh && cachedData && cachedTimestamp && now - parseInt(cachedTimestamp) < 30 * 60 * 1000) {
-        const parsedData = JSON.parse(cachedData);
-        
+      if (!forceRefresh && cachedData && cachedTimestamp && cachedLastCommitDate && now - parseInt(cachedTimestamp) < 30 * 60 * 1000) {
+        const parsedData = JSON.parse(cachedData) as FanArt[]; // Ensure type
         const sizedFanArts = assignRandomSizesToFanArts(parsedData);
         setFanArts(sizedFanArts);
         setFilteredFanArts(sortFanArts(sizedFanArts, sortOrder));
-        setLastUpdated(new Date(parseInt(cachedTimestamp)).toLocaleTimeString());
+        setLastUpdated(new Date(cachedLastCommitDate).toLocaleString());
         setLoading(false);
         return;
       }
       
       setRefreshing(true);
 
-      
       const response = await fetch(
         `https://api.github.com/repos/La-grotte-de-Juju/La-grotte-de-Juju-Ressources/contents/Fanarts/classic`,
         {
@@ -268,38 +215,57 @@ export default function FanArtGallery() {
 
       const data = await response.json();
       
-      
       const imageExtensions = [".jpg", ".jpeg", ".png", ".gif", ".webp"];
       const imageFiles = data.filter((item: {type: string; name: string}) =>
         item.type === "file" &&
         imageExtensions.some(ext => item.name.toLowerCase().endsWith(ext))
       );
 
-      
-      const fanArtsWithUrls = imageFiles.map((file: {name: string; download_url: string; path: string; sha: string}) => ({
-        name: file.name,
-        download_url: file.download_url,
-        path: file.path,
-        sha: file.sha
-      }));
-      
-      
-      const optimizedFanArts = assignOptimizedSizesToFanArts(fanArtsWithUrls);
+      const fanArtPromises = imageFiles.map(async (file: {name: string; download_url: string; path: string; sha: string}) => {
+        let fileCommitDate: string | undefined = undefined;
+        try {
+          const commitInfoResponse = await fetch(
+            `https://api.github.com/repos/La-grotte-de-Juju/La-grotte-de-Juju-Ressources/commits?path=${encodeURIComponent(file.path)}&page=1&per_page=1`,
+            {
+              headers: { Accept: "application/vnd.github.v3+json" },
+            }
+          );
+          if (commitInfoResponse.ok) {
+            const commitData = await commitInfoResponse.json();
+            if (commitData && commitData.length > 0 && commitData[0].commit && commitData[0].commit.committer) {
+              fileCommitDate = commitData[0].commit.committer.date;
+            }
+          } else {
+            console.warn(`Failed to fetch commit date for ${file.name}: ${commitInfoResponse.statusText}`);
+          }
+        } catch (error) {
+          console.warn(`Error fetching commit date for ${file.name}:`, error);
+        }
+        return {
+          name: file.name,
+          download_url: file.download_url,
+          path: file.path,
+          sha: file.sha,
+          commitDate: fileCommitDate,
+        };
+      });
 
+      const fanArtsWithDates = await Promise.all(fanArtPromises);
       
+      const optimizedFanArts = assignOptimizedSizesToFanArts(fanArtsWithDates);
+
       try {
-        
-        localStorage.setItem(cacheKey, JSON.stringify(fanArtsWithUrls));
+        localStorage.setItem(cacheKey, JSON.stringify(fanArtsWithDates)); // Store fanarts with dates
         const timestamp = new Date().getTime();
         localStorage.setItem(timestampKey, timestamp.toString());
-        setLastUpdated(new Date(timestamp).toLocaleTimeString());
+        localStorage.setItem(lastCommitDateKey, new Date().toISOString());
+        setLastUpdated(new Date().toLocaleString());
       } catch (e) {
         console.warn(`Failed to cache fan arts data:`, e);
       }
 
       setFanArts(optimizedFanArts);
       setFilteredFanArts(sortFanArts(optimizedFanArts, sortOrder));
-      setLastUpdated(new Date().toLocaleString());
     } catch (err) {
       console.error(`Erreur lors de la récupération des fan arts:`, err);
       setError(`Impossible de charger les fan arts. Veuillez réessayer plus tard.`);
@@ -309,101 +275,84 @@ export default function FanArtGallery() {
     }
   }, [sortOrder]);
 
-  
   const handleRefresh = () => {
     fetchFanArts(true);
     if (!isSearchMode) setVisibleCount(ITEMS_PER_PAGE);
-    
-    
-    
     const resizedFanArts = assignRandomSizesToFanArts([...fanArts]);
     setFanArts(resizedFanArts);
     setFilteredFanArts(sortFanArts(resizedFanArts, sortOrder));
   };
 
-  
   const galleryRef = useRef<HTMLDivElement>(null);
   const isGalleryVisible = useIntersectionObserver(galleryRef);
 
-  
   useEffect(() => {
     fetchFanArts();
   }, [fetchFanArts]);
 
-  
-  
-  
   const loadImagesProgressively = useCallback((totalCount: number) => {
-    
-    
     setVisibleItems(Array.from({ length: totalCount }, (_, i) => i));
-    
-    
-    
-    
-    
     return () => {};
   }, []);
 
-  
   useEffect(() => {
-    
     if (!loading && filteredFanArts.length > 0 && (isGalleryVisible || visibleItems.length > 0)) {
       const itemsToShow = isSearchMode 
         ? filteredFanArts.length 
         : Math.min(visibleCount, filteredFanArts.length);
-      
-      
       requestAnimationFrame(() => {
-        
         loadImagesProgressively(itemsToShow);
-  
-        
         setImagesLoaded({});
       });
     }
   }, [loading, filteredFanArts, visibleCount, isSearchMode, isGalleryVisible, loadImagesProgressively, visibleItems.length]);
 
-  
   const sortFanArts = (arts: FanArt[], order: 'newest' | 'oldest' | 'alphabetical'): FanArt[] => {
     const sorted = [...arts];
+    // Fallback dates for sorting items where commitDate might be missing
+    const fallbackDateEpoch = new Date(0).getTime(); // Very old date
+    const fallbackDateFuture = new Date(8640000000000000).getTime(); // Very far future date
 
     switch (order) {
       case 'alphabetical':
         return sorted.sort((a, b) => a.name.localeCompare(b.name));
       case 'newest':
-        
-        return sorted.sort((a, b) => b.sha.localeCompare(a.sha));
+        return sorted.sort((a, b) => {
+          const timeA = a.commitDate ? new Date(a.commitDate).getTime() : fallbackDateEpoch;
+          const timeB = b.commitDate ? new Date(b.commitDate).getTime() : fallbackDateEpoch;
+          if (timeB === timeA) {
+            return a.name.localeCompare(b.name); // Stabilize with name if dates are same or both are fallbacks
+          }
+          return timeB - timeA; // Newest first
+        });
       case 'oldest':
-        return sorted.sort((a, b) => a.sha.localeCompare(b.sha));
+        return sorted.sort((a, b) => {
+          const timeA = a.commitDate ? new Date(a.commitDate).getTime() : fallbackDateFuture;
+          const timeB = b.commitDate ? new Date(b.commitDate).getTime() : fallbackDateFuture;
+          if (timeA === timeB) {
+            return a.name.localeCompare(b.name); // Stabilize with name
+          }
+          return timeA - timeB; // Oldest first
+        });
       default:
         return sorted;
     }
   };
   
-  
   useEffect(() => {
     if (fanArts.length > 0) {
       let results = [...fanArts];
-      
-      
       if (searchQuery.trim()) {
         const query = searchQuery.trim().toLowerCase();
         results = results.filter(art => 
           art.name.toLowerCase().includes(query)
         );
-        
         setIsSearchMode(true);
       } else {
-        
         setIsSearchMode(false);
-        
         setVisibleCount(ITEMS_PER_PAGE);
       }
-      
-      
       results = sortFanArts(results, sortOrder);
-      
       setFilteredFanArts(results);
     }
   }, [sortOrder, fanArts, searchQuery, ITEMS_PER_PAGE]);
@@ -417,56 +366,39 @@ export default function FanArtGallery() {
     setViewerOpen(false);
   };
   
-  
   const loadMoreImages = () => {
-    
     const newCount = Math.min(visibleCount + ITEMS_PER_PAGE, filteredFanArts.length);
-    
-    
-    
     setVisibleCount(newCount);
     setVisibleItems(Array.from({ length: newCount }, (_, i) => i));
   };
   
-  
   const loadAllImages = () => {
-    
     setShowLoadAllWarning(false);
-    
-    
     const allImagesCount = filteredFanArts.length;
-    
-    
     setVisibleCount(allImagesCount);
     setVisibleItems(Array.from({ length: allImagesCount }, (_, i) => i));
   };
   
-  
   const showLoadAllWarningModal = () => {
     setShowLoadAllWarning(true);
   };
-  
   
   useEffect(() => {
     const handleNext = (event: Event) => {
       const customEvent = event as CustomEvent;
       setSelectedFanArt(customEvent.detail.fanArt);
     };
-    
     const handlePrev = (event: Event) => {
       const customEvent = event as CustomEvent;
       setSelectedFanArt(customEvent.detail.fanArt);
     };
-    
     document.addEventListener('nextFanArt', handleNext);
     document.addEventListener('prevFanArt', handlePrev);
-    
     return () => {
       document.removeEventListener('nextFanArt', handleNext);
       document.removeEventListener('prevFanArt', handlePrev);
     };
   }, []);
-  
   
   if (loading) {
     return (
@@ -476,12 +408,11 @@ export default function FanArtGallery() {
           alt="Chargement en cours" 
           className="w-20 h-20 mb-4"
         />
-        <p className="text-xl text-gray-600 dark:text-gray-400">Acquisition des images depuis l\'API...</p>
+        <p className="text-xl text-gray-600 dark:text-gray-400">Acquisition des images depuis l'API...</p>
       </div>
     );
   }
 
-  
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[40vh] p-8 text-center">
@@ -494,17 +425,14 @@ export default function FanArtGallery() {
     );
   }
 
-  
   const totalImages = filteredFanArts.length;
   const totalOriginalImages = fanArts.length;
   
   return (
     <div className="flex flex-col md:flex-row gap-4">
-      
       <div className="hidden md:block md:w-64 lg:w-72 flex-shrink-0">
         <div className="sticky top-32 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md p-4 rounded-lg border border-gray-200 dark:border-gray-800 shadow-sm">
           <div className="flex flex-col gap-5">
-            
             <div className="relative w-full">
               <label htmlFor="search" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                 Rechercher des fan arts
@@ -536,8 +464,6 @@ export default function FanArtGallery() {
                 )}
               </div>
             </div>
-            
-            
             <div>
               <label htmlFor="sort-order" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                 Trier par
@@ -547,7 +473,6 @@ export default function FanArtGallery() {
                 value={sortOrder}
                 onChange={(e) => {
                   setSortOrder(e.target.value as 'newest' | 'oldest' | 'alphabetical');
-                  
                   if (!isSearchMode) setVisibleCount(ITEMS_PER_PAGE);
                 }}
                 className="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md px-3 py-2 text-sm w-full focus:ring-2 focus:ring-purple-500 focus:border-transparent"
@@ -557,8 +482,6 @@ export default function FanArtGallery() {
                 <option value="alphabetical">Alphabétique</option>
               </select>
             </div>
-            
-            
             {totalOriginalImages > 0 && (
               <div className="text-sm text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800/50 p-3 rounded-md">
                 <div className="font-medium mb-1">Statistiques</div>
@@ -586,8 +509,6 @@ export default function FanArtGallery() {
                 )}
               </div>
             )}
-            
-            
             <button
               onClick={handleRefresh}
               disabled={refreshing || loading}
@@ -602,10 +523,7 @@ export default function FanArtGallery() {
           </div>
         </div>
       </div>
-      
-      
       <div className="flex-1">
-        
         <div className="md:hidden flex flex-col gap-4 mb-6 px-3">
           <div className="relative w-full">
             <input
@@ -632,7 +550,6 @@ export default function FanArtGallery() {
               </button>
             )}
           </div>
-          
           <div className="flex items-center gap-2 w-full">
             <label htmlFor="mobile-sort-order" className="text-sm font-medium text-gray-600 dark:text-gray-400 whitespace-nowrap">
               Trier par:
@@ -641,7 +558,6 @@ export default function FanArtGallery() {
                 value={sortOrder}
                 onChange={(e) => {
                   setSortOrder(e.target.value as 'newest' | 'oldest' | 'alphabetical');
-                  
                   if (!isSearchMode) setVisibleCount(ITEMS_PER_PAGE);
                 }}
                 className="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md px-3 py-2 text-base w-full focus:ring-2 focus:ring-purple-500 focus:border-transparent"
@@ -651,8 +567,6 @@ export default function FanArtGallery() {
               <option value="alphabetical">Alphabétique</option>
             </select>
           </div>
-          
-          
           <button
             onClick={handleRefresh}
             disabled={refreshing || loading}
@@ -664,8 +578,6 @@ export default function FanArtGallery() {
             <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
             {refreshing ? 'Mise à jour...' : 'Rafraîchir les images'}
           </button>
-          
-          
           {totalOriginalImages > 0 && (
             <div className="text-sm text-gray-500 dark:text-gray-400">
               {isSearchMode ? (
@@ -679,11 +591,8 @@ export default function FanArtGallery() {
             </div>
           )}
         </div>
-
-        
         <div className="mb-8 mx-4">
           <div className="relative overflow-hidden rounded-lg">
-            
             <div
               className="p-5 text-center relative"
               style={{
@@ -692,14 +601,12 @@ export default function FanArtGallery() {
                 animation: 'gradientBg 8s ease infinite'
               }}
             >
-              
               <div 
                 className="absolute inset-0 pointer-events-none rounded-sm"
                 style={{ 
                   boxShadow: 'inset 0 0 0 2px rgba(255, 255, 255, 0.6)'
                 }}
               ></div>
-              
               <p className="font-medium relative">
                 <span style={{ 
                   background: 'linear-gradient(to right, #4f46e5, #9333ea, #db2777)', 
@@ -708,12 +615,10 @@ export default function FanArtGallery() {
                   backgroundSize: '200% 200%',
                   animation: 'gradientBg 8s ease infinite'
                 }}>
-                  Tu as créé un fan art ? Partage ta création avec nous sur les réseaux sociaux ou contacte-nous directement pour l\'ajouter à la galerie !
+                  Tu as créé un fan art ? Partage ta création avec nous sur les réseaux sociaux ou contacte-nous directement pour l'ajouter à la galerie !
                 </span>
               </p>
             </div>
-            
-            
             <div 
               className="absolute -bottom-4 -z-10 left-2 right-2 h-8 blur-xl opacity-40"
               style={{
@@ -724,8 +629,6 @@ export default function FanArtGallery() {
               }}
             />
           </div>
-          
-          
           <style jsx>{`
             @keyframes gradientBg {
               0% {
@@ -738,40 +641,29 @@ export default function FanArtGallery() {
                 background-position: 0% 50%;
               }
             }
-            
-            
-            
             .bento-card {
               transition: transform 0.3s ease, box-shadow 0.3s ease;
             }
-            
             .bento-card:hover {
               transform: translateY(-5px);
               box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
             }
-            
-            
             .tall-card {
               transition: transform 0.3s ease, box-shadow 0.4s ease;
             }
-            
             .tall-card:hover {
               transform: translateY(-7px) scale(1.01);
               box-shadow: 0 15px 30px -10px rgba(168, 85, 247, 0.2), 
                           0 10px 20px -5px rgba(168, 85, 247, 0.1);
             }
-            
-            
             .tall-image {
               transition: all 0.5s ease-out;
             }
-            
             .group:hover .tall-image {
               transform: scale(1.12) !important;
               filter: contrast(1.05) brightness(1.02);
             }
           `}</style>
-          
           {loading ? (
             <div className="flex flex-col items-center justify-center p-8">
               <img 
@@ -801,13 +693,10 @@ export default function FanArtGallery() {
                 ref={galleryRef}
                 className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-6 auto-rows-[160px] gap-4 md:gap-5 p-3 md:p-4 min-h-[400px] will-change-contents"
                 style={{
-                  
                   gridAutoFlow: 'dense'
                 }}
               >
-                
                 {(isSearchMode ? filteredFanArts : filteredFanArts.slice(0, visibleCount)).map((fanArt, index) => {
-                  
                   const sizeClasses = {
                     'small': 'col-span-1 row-span-1',
                     'medium': 'col-span-2 row-span-1',
@@ -815,10 +704,7 @@ export default function FanArtGallery() {
                     'tall': 'col-span-2 row-span-2',
                     'wide': 'col-span-3 row-span-1'
                   };
-                  
-                  
                   const sizeClass = sizeClasses[fanArt.size || 'medium'];
-                  
                   return (
                     <div
                       key={fanArt.sha}
@@ -832,12 +718,10 @@ export default function FanArtGallery() {
                         onClick={() => handleFanArtClick(fanArt)}
                         style={{
                           borderRadius: FIXED_BORDER_RADIUS,
-                          
                           boxShadow: fanArt.size === 'tall' ? '0 0 0 2px rgba(168, 85, 247, 0.15)' : undefined,
                         }}
                       >
                         <div className="relative w-full h-full overflow-hidden" style={{ borderRadius: 'inherit' }}>
-                          
                           <div className="absolute inset-0 flex items-center justify-center bg-gray-100 dark:bg-gray-800 z-10 transition-opacity group-hover:opacity-0">
                             <img 
                               src="/images/JujuLoading.gif" 
@@ -845,14 +729,12 @@ export default function FanArtGallery() {
                               className="w-12 h-12" 
                             />
                           </div>
-
                           <img
                             src={fanArt.download_url}
                             alt={`Fan art: ${fanArt.name}`}
                             className={`w-full h-full object-cover transition-all duration-500 group-hover:scale-110 ${fanArt.size === 'tall' ? 'tall-image' : ''}`}
                             style={{ 
                               objectFit: 'cover', 
-                              
                               objectPosition: 'center',
                               transform: fanArt.zoomFactor ? 
                                 `scale(${fanArt.size === 'tall' ? 
@@ -864,10 +746,7 @@ export default function FanArtGallery() {
                             loading="eager"
                             fetchPriority={index < 8 ? "high" : "auto"}
                             onLoad={(e) => {
-                              
                               setImagesLoaded(prev => ({ ...prev, [fanArt.sha]: true }));
-                              
-                              
                               const target = e.target as HTMLImageElement;
                               const parent = target.parentElement;
                               if (parent) {
@@ -883,8 +762,6 @@ export default function FanArtGallery() {
                               }
                             }}
                           />
-                          
-                          
                           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300 flex items-end opacity-0 group-hover:opacity-100">
                             <span className="text-white text-xs md:text-sm p-2 truncate w-full bg-black/50 backdrop-blur-sm">
                               {fanArt.name.replace(/\.(jpg|jpeg|png|gif|webp)$/i, '')}
@@ -896,8 +773,6 @@ export default function FanArtGallery() {
                   );
                 })}
               </div>
-              
-              
               {!isSearchMode && visibleCount < filteredFanArts.length && (
                 <div className="flex flex-col sm:flex-row justify-center items-center gap-3 mt-6 mb-4">
                   <button
@@ -907,7 +782,6 @@ export default function FanArtGallery() {
                     <RefreshCw className="h-4 w-4" />
                     Charger 12 images de plus ({Math.min(ITEMS_PER_PAGE, filteredFanArts.length - visibleCount)} sur {filteredFanArts.length - visibleCount})
                   </button>
-                  
                   <button
                     onClick={showLoadAllWarningModal}
                     className="py-2 px-4 flex items-center justify-center gap-2 text-sm font-medium rounded-md bg-red-100 hover:bg-red-200 dark:bg-red-900/30 dark:hover:bg-red-800/40 text-red-600 dark:text-red-400 hover:text-red-700 transition-all duration-200"
@@ -917,8 +791,6 @@ export default function FanArtGallery() {
                   </button>
                 </div>
               )}
-              
-              
               <Dialog open={showLoadAllWarning} onOpenChange={setShowLoadAllWarning}>
                 <DialogContent className="sm:max-w-md">
                   <DialogHeader>
@@ -930,7 +802,6 @@ export default function FanArtGallery() {
                       Vous êtes sur le point de charger toutes les {filteredFanArts.length - visibleCount} images restantes.
                     </DialogDescription>
                   </DialogHeader>
-                  
                   <div className="py-3 space-y-3">
                     <p className="text-sm text-gray-700 dark:text-gray-300">
                       Cette action peut :
@@ -945,7 +816,6 @@ export default function FanArtGallery() {
                       Il est recommandé de charger les images progressivement pour une meilleure expérience.
                     </p>
                   </div>
-                  
                   <DialogFooter className="flex sm:justify-between">
                     <Button variant="outline" onClick={() => setShowLoadAllWarning(false)}>
                       Annuler
@@ -964,8 +834,6 @@ export default function FanArtGallery() {
           )}
         </div>
       </div>
-      
-      
       <FanArtViewer
         fanArt={selectedFanArt}
         isOpen={viewerOpen}

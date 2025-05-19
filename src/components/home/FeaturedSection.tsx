@@ -8,9 +8,9 @@ import AnimateOnScroll from "@/components/animation/AnimateOnScroll";
 
 const featuredItems = [
 	{
-		title: "Strip de la Grotte",
+		title: "Bibliothèque",
 		description:
-			"Découvrez l'univers sombre et comique de Batlife, une parodie de super-héros avec un style unique.",
+			"Tu pourras lire toutes les BD confectionnées par Juju.",
 		image: "/images/animation/Strip-grotte-Visual.gif",
 		link: "/dessins/batlife-comics",
 	},
@@ -38,11 +38,11 @@ export function FeaturedSection() {
 					<AnimateOnScroll animation="slide-right">
 						<div className="space-y-2">
 							<h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight title-font">
-								Créations{" "}
-								<span className="text-primary">en vedette</span>
+								Le meilleur de{" "}
+								<span className="text-primary">La grotte</span>
 							</h2>
 							<p className="max-w-[600px] text-muted-foreground md:text-xl">
-								Découvrez le meilleur de la Grotte de Juju.
+								Accède au meilleur du contenu de Juju en quelques instants.
 							</p>
 						</div>
 					</AnimateOnScroll>
