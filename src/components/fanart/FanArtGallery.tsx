@@ -8,6 +8,20 @@ import { useIntersectionObserver } from "./useIntersectionObserver";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "../ui/dialog";
 import { Button } from "../ui/button";
 
+// Define interfaces for GitHub API responses
+interface GithubContentEntry {
+  type: string;
+  name: string;
+  path: string;
+  sha: string;
+  download_url: string | null;
+}
+
+interface GitHubFile extends GithubContentEntry {
+  type: 'file';
+  download_url: string; // Ensure download_url is string for files
+}
+
 interface FanArt {
   name: string;
   download_url: string;
@@ -236,12 +250,13 @@ export default function FanArtGallery() {
         throw new Error("Format de données incorrect reçu de l'API GitHub (attendu un tableau).");
       }
 
-      const fanArtItems = rawData.filter((item: any) => 
-        item.type === 'file' && 
+      const fanArtItems = (rawData as GithubContentEntry[]).filter(
+        (item: GithubContentEntry): item is GitHubFile =>
+        item.type === 'file' &&
         /\.(jpg|jpeg|png|gif|webp)$/i.test(item.name)
       );
 
-      const fanArtsWithDatesPromises = fanArtItems.map(async (item: any) => {
+      const fanArtsWithDatesPromises = fanArtItems.map(async (item: GitHubFile) => {
         try {
           const commitResponse = await fetch(`https://api.github.com/repos/lagrottedejuju/website-images/commits?path=${encodeURIComponent(item.path)}&page=1&per_page=1&ref=main`);
           if (!commitResponse.ok) {
@@ -277,13 +292,13 @@ export default function FanArtGallery() {
       localStorage.setItem(timestampKey, new Date().getTime().toString());
       localStorage.setItem(lastCommitDateKey, latestCommitDate.toISOString());
 
-    } catch (err: any) { 
+    } catch (err: unknown) { 
       console.error("Échec de la récupération des fan arts:", err);
       let displayError = "Oups! Une erreur est survenue\n\nImpossible de charger les fan arts. Veuillez réessayer plus tard.";
-      if (err && err.message) {
+      if (err instanceof Error) {
          if (err.message.includes("L'API GitHub a retourné une erreur") || 
              err.message.includes("Format de données incorrect") ||
-             err.message.includes("Erreur 403: Accès refusé par l'API GitHub")) { // Ensure the new specific message is caught
+             err.message.includes("Erreur 403: Accès refusé par l'API GitHub")) {
              displayError = err.message;
          }
       }
