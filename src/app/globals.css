@@ -34,8 +34,20 @@
 
   html {
     scroll-behavior: smooth;
+    /* Styles pour cacher la barre de défilement native pour Firefox sur html */
+    scrollbar-width: none; 
   }
   
+  /* Styles pour cacher la barre de défilement native du navigateur */
+  html, body {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none; /* Firefox, répété pour body pour s'assurer */
+  }
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+  }
+
   .dark {
     --background: 20 14.3% 4.1%;
     --foreground: 60 9.1% 97.8%;
@@ -95,6 +107,8 @@
 
 }
 
+/* Suppression des anciens styles de barre de défilement personnalisée ici */
+
 @layer base {
   * {
     @apply border-border;
@@ -103,7 +117,6 @@
     @apply bg-background text-foreground;
   }
 }
-
 
 .nav-fixed-button {
   transform: translateY(-50%) !important;
@@ -120,8 +133,6 @@
   border: none !important;
 }
 
-
-
 .hero-image {
   transition: transform 0.5s ease-out, box-shadow 0.5s ease;
 }
@@ -131,12 +142,10 @@
   box-shadow: 0 15px 30px -10px rgba(0, 0, 0, 0.2);
 }
 
-
 .shine-effect {
   position: relative;
   overflow: hidden;
 }
-
 
 .steam-card {
   position: relative;
@@ -171,7 +180,6 @@
   opacity: 1;
 }
 
-
 .btn-primary-shine {
   position: relative;
   overflow: hidden;
@@ -189,7 +197,6 @@
   box-shadow: 0 5px 10px -3px hsl(var(--primary)/0.7);
 }
 
-
 .btn-outline-animate {
   position: relative;
   transition: all 0.3s ease;
@@ -206,7 +213,6 @@
   transform: translateY(-1px);
 }
 
-
 .btn-pulse {
   animation: button-pulse 2s infinite;
 }
@@ -222,9 +228,6 @@
     box-shadow: 0 0 0 0 hsl(var(--primary)/0);
   }
 }
-
-
-
 
 .btn,
 button[class*="btn"],
@@ -245,7 +248,6 @@ a[role="button"] {
   backface-visibility: hidden;
 }
 
-
 .btn-premium {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border: 1px solid hsl(var(--primary)/0.3);
@@ -261,7 +263,6 @@ a[role="button"] {
 .btn-premium:active {
   transform: translateY(0);
 }
-
 
 .btn-card-premium {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -281,7 +282,6 @@ a[role="button"] {
   transform: translateY(1px);
   box-shadow: 0 2px 6px -2px hsl(var(--primary)/0.15);
 }
-
 
 button, 
 .button,
@@ -306,7 +306,6 @@ a[role="button"]:active,
 [class*="btn"]:active {
   transform: translateY(0);
 }
-
 
 button::after, 
 .button::after,
@@ -335,7 +334,6 @@ a[role="button"]:active::after,
   opacity: 0;
   transition: 0s;
 }
-
 
 header button, 
 header .button,
@@ -369,7 +367,6 @@ nav [class*="btn"]:active {
   transform: translateY(0);
 }
 
-
 @keyframes header-button-glow {
   0% {
     box-shadow: 0 0 0 0 hsla(var(--primary), 0.4);
@@ -390,7 +387,6 @@ nav .button:hover,
 nav [class*="btn"]:hover {
   animation: header-button-glow 2s infinite;
 }
-
 
 .header-btn {
   position: relative;
@@ -456,7 +452,6 @@ nav [class*="btn"]:hover {
   animation: header-button-ambient 3s ease infinite;
 }
 
-
 .header-btn svg {
   transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
@@ -464,7 +459,6 @@ nav [class*="btn"]:hover {
 .header-btn:hover svg {
   transform: rotate(10deg) scale(1.1);
 }
-
 
 @keyframes subtle-shimmer {
   0% {
@@ -501,25 +495,18 @@ nav [class*="btn"]:hover {
   animation: subtle-shimmer 1.5s infinite;
 }
 
-
 body.menu-open-blur > *:not(div[data-testid="navbar-container"]):not(#mobile-menu-container) {
   filter: blur(8px);
   transition: filter 0.3s ease-in-out;
-  
-  
-  
 }
-
 
 div[data-testid="navbar-container"] {
   filter: none !important; 
 }
 
-
 #mobile-menu-container {
   filter: none !important;
 }
-
 
 body > *:not(div[data-testid="navbar-container"]):not(#mobile-menu-container) {
   transition: filter 0.3s ease-in-out;
@@ -527,7 +514,6 @@ body > *:not(div[data-testid="navbar-container"]):not(#mobile-menu-container) {
 
 @layer utilities {
   .text-glow-primary {
-    
     text-shadow: 0 0 5px hsl(var(--primary) / 0.7),
                  0 0 10px hsl(var(--primary) / 0.5),
                  0 0 20px hsl(var(--primary) / 0.3),

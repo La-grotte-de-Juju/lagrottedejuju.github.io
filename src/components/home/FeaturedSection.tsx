@@ -84,7 +84,7 @@ export function FeaturedSection() {
 							animation="slide-up"
 							delay={0.1 * (index + 1)}
 						>
-							<Card className="overflow-hidden">
+							<Card className="overflow-hidden h-full flex flex-col">
 								<div className="aspect-video relative">
 									<Image
 										src={item.image}
@@ -93,7 +93,7 @@ export function FeaturedSection() {
 										className="object-cover"
 									/>
 								</div>
-								<CardHeader>
+								<CardHeader className="flex-grow">
 									<CardTitle className="title-font">
 										{item.title}
 									</CardTitle>

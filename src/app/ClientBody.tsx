@@ -5,6 +5,7 @@ import LoadingScreen from "@/components/layout/LoadingScreen";
 import PageTransition from "@/components/animation/PageTransition";
 import { usePathname } from "next/navigation";
 import { DevNotification } from "@/components/ui/dev-notification";
+import CustomScrollbar from "@/components/ui/CustomScrollbar"; // Import du composant
 
 export default function ClientBody({
   children,
@@ -26,6 +27,7 @@ export default function ClientBody({
             </PageTransition>
           </RootLayout>
           <DevNotification />
+          <CustomScrollbar /> {/* Ajout du composant ici pour qu'il s'affiche sur toutes les pages */}
         </>
       )}
     </body>

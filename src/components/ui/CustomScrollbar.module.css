@@ -1,0 +1,69 @@
+.customScrollbarNotch {
+  position: fixed;
+  right: 8px; /* Slightly more space from the edge */
+  top: 50%;
+  transform: translateY(-50%);
+  width: 10px; /* Slightly wider for a better grab area */
+  height: 120px; /* Adjusted height */
+  background-color: rgba(0, 0, 0, 0.5); /* Even softer, more transparent */
+  border-radius: 5px; /* Smoother rounded ends */
+  transition: width 0.35s cubic-bezier(0.25, 0.1, 0.25, 1),
+              height 0.35s cubic-bezier(0.25, 0.1, 0.25, 1),
+              background-color 0.35s cubic-bezier(0.25, 0.1, 0.25, 1),
+              opacity 0.35s cubic-bezier(0.25, 0.1, 0.25, 1),
+              border-radius 0.35s cubic-bezier(0.25, 0.1, 0.25, 1); /* Adjusted easing function */
+  z-index: 10000;
+  overflow: hidden;
+  opacity: 0; /* Start fully transparent, controlled by .visible */
+  -webkit-backdrop-filter: blur(12px); /* Slightly more blur */
+  backdrop-filter: blur(12px); /* Slightly more blur */
+}
+
+.customScrollbarNotch.visible { /* New class to control initial fade-in */
+  opacity: 1; /* Default visible state (reduced) */
+}
+
+.customScrollbarNotch.hover,
+.customScrollbarNotch.scrolling {
+  width: 14px; /* Expands on hover or scroll */
+  height: 200px; /* Expands on hover or scroll */
+  background-color: rgb(255, 255, 255); /* Darker on interaction */
+  opacity: 1; /* Fully opaque on interaction */
+  border-radius: 7px; /* Slightly larger radius when expanded */
+}
+
+.customScrollbarThumb {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 8px; /* Wider thumb for better visibility and interaction */
+  background-color: rgb(255, 255, 255); /* Softer thumb color */
+  border-radius: 4px; /* Smoother rounded ends for the thumb */
+  transition: background-color 0.35s cubic-bezier(0.25, 0.1, 0.25, 1),
+              height 0.35s cubic-bezier(0.25, 0.1, 0.25, 1),
+              opacity 0.35s cubic-bezier(0.25, 0.1, 0.25, 1),
+              width 0.35s cubic-bezier(0.25, 0.1, 0.25, 1),
+              border-radius 0.35s cubic-bezier(0.25, 0.1, 0.25, 1); /* Adjusted easing and unified duration */
+  opacity: 0; /* Thumb is hidden by default, appears with notch interaction */
+}
+
+.customScrollbarNotch.visible.hover .customScrollbarThumb,
+.customScrollbarNotch.visible.scrolling .customScrollbarThumb {
+  opacity: 1; /* Visible on hover or scroll */
+  background-color: rgba(255, 255, 255, 0.85); /* Brighter on interaction */
+  width: 10px; /* Thumb widens slightly on interaction */
+  border-radius: 5px; /* Match notch's expanded state a bit more */
+}
+
+/* Ensure thumb is visible when notch is in its base 'visible' state but not actively hovered/scrolled */
+.customScrollbarNotch.visible:not(.hover):not(.scrolling) .customScrollbarThumb {
+  opacity: 0.7; /* Make thumb subtly visible in the reduced notch state */
+  width: 6px; /* Make thumb a bit thinner in reduced state */
+  background-color: rgba(255, 255, 255, 0.5); /* Slightly more transparent thumb */
+}
+
+.customScrollbarThumb:hover {
+  background-color: rgba(255, 255, 255, 1); /* Fully opaque on thumb hover */
+}
+
+/* Les styles pour cacher la barre de défilement native ont été déplacés vers globals.css */
