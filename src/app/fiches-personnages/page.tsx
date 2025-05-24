@@ -182,21 +182,10 @@ const itemVariants = {
 };
 
 export default function FichesPersonnagesPage() {
-  const container = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.15,
-        delayChildren: 0.4,
-      }
-    }
-  };
-
   return (
     <div className="py-20 md:py-24 lg:py-28">
       <div className="container px-4 md:px-6">
-        <AnimateOnScroll animation="slide-down" delay={0.1}>
+        <AnimateOnScroll animation="crystal-emerge" delay={0.1} intensity={1.2}>
           <div className="flex flex-col items-center text-center mb-16 md:mb-24">
             <h1 className="text-4xl md:text-5xl font-bold tracking-tighter mb-6">
               Fiches des Personnages
@@ -207,18 +196,13 @@ export default function FichesPersonnagesPage() {
           </div>
         </AnimateOnScroll>
 
-        <motion.div
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-16 px-8 py-8"
-          variants={container}
-          initial="hidden"
-          animate="show"
-          style={{ position: 'relative', padding: '20px' }}
-        >
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-16 px-8 py-8">
           {personnages.map((personnage, index) => (
-            <div key={personnage.id} className="relative" style={{ margin: '40px 0', padding: '20px', transformStyle: 'preserve-3d' }}>
+            <div key={personnage.id} className="relative">
               <AnimateOnScroll
-                animation="fancy-card"
-                delay={0.1 * (index + 1)}
+                animation="perspective-tilt"
+                delay={0.15 * index}
+                intensity={0.9}
               >
               <Dialog>
                 <DialogTrigger asChild>
@@ -323,7 +307,7 @@ export default function FichesPersonnagesPage() {
             </AnimateOnScroll>
             </div>
           ))}
-        </motion.div>
+        </div>
       </div>
     </div>
   );

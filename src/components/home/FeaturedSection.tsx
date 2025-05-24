@@ -2,139 +2,195 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import AnimateOnScroll from "@/components/animation/AnimateOnScroll";
+import { motion } from "framer-motion";
+import { BookOpen, Users, Film, Sparkles, Star, ArrowRight } from "lucide-react";
+import { useState } from "react";
 
 const featuredItems = [
 	{
-		title: "Bibliothèque",
-		description:
-			"Tu pourras lire toutes les BD confectionnées par Juju.",
+		title: "Bibliothèque de Comics",
+		description: "Plongez dans l'univers captivant de Batlife à travers des bandes dessinées pleines d'humour et d'aventures épiques.",
 		image: "/images/animation/Strip-grotte-Visual.gif",
 		link: "/dessins/batlife-comics",
+		icon: BookOpen,
+		category: "BD & Comics",
+		color: "from-emerald-500 to-teal-600",
+		stats: "25+ Comics",
+		bgPattern: "bg-emerald-50 dark:bg-emerald-950/20"
 	},
 	{
-		title: "Fiche des personnages",
-		description:
-			"Explorez les personnages de Batlife et leurs histoires dans un univers riche et coloré.",
+		title: "Galerie des Héros",
+		description: "Découvrez les personnages attachants de La Grotte avec leurs histoires fascinantes et leurs secrets les mieux gardés.",
 		image: "/images/animation/fichepersos.gif",
 		link: "/fiches-personnages",
+		icon: Users,
+		category: "Personnages",
+		color: "from-purple-500 to-indigo-600",
+		stats: "12 Personnages",
+		bgPattern: "bg-purple-50 dark:bg-purple-950/20"
 	},
 	{
-		title: "Séries animées",
-		description:
-			"Des animations originales avec un style unique et des histoires captivantes.",
+		title: "Animations Exclusives",
+		description: "Vivez des aventures épiques avec nos séries animées au style unique et aux histoires captivantes qui vous transporteront.",
 		image: "/images/dev img/5.webp",
 		link: "/series",
+		icon: Film,
+		category: "Animations",
+		color: "from-orange-500 to-red-600",
+		stats: "8 Épisodes",
+		bgPattern: "bg-orange-50 dark:bg-orange-950/20"
 	},
 ];
 
+function FeatureCard({ item, index }: { item: typeof featuredItems[0], index: number }) {
+	const [isHovered, setIsHovered] = useState(false);
+	
+	return (
+		<motion.div
+			className="group relative h-full"
+			onMouseEnter={() => setIsHovered(true)}
+			onMouseLeave={() => setIsHovered(false)}
+			whileHover={{ y: -8 }}
+			transition={{ type: "tween", duration: 0.2, ease: "easeOut" }}
+		>
+			{/* Carte principale avec effets de hover optimisés */}
+			<div className="relative h-full bg-white dark:bg-gray-900/95 rounded-3xl overflow-hidden shadow-lg group-hover:shadow-xl transition-shadow duration-300 border border-gray-200/50 dark:border-gray-700/50">
+				
+				{/* Image avec ratio 16:9 et effets optimisés */}
+				<div className="relative aspect-video overflow-hidden">
+					<Image
+						src={item.image}
+						alt={item.title}
+						fill
+						className="object-cover transition-transform duration-300 group-hover:scale-105"
+						sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+					/>
+					
+					{/* Overlay gradient simplifié */}
+					<div className={`absolute inset-0 bg-gradient-to-t ${item.color} opacity-0 group-hover:opacity-20 transition-opacity duration-300`}></div>
+					
+					{/* Badge catégorie flottant */}
+					<div className="absolute top-4 left-4 z-20">
+						<div className={`px-4 py-2 rounded-full text-sm font-bold bg-gradient-to-r ${item.color} text-white shadow-lg`}>
+							{item.category}
+						</div>
+					</div>
+				</div>
+
+				{/* Contenu avec design moderne */}
+				<div className="p-8 space-y-4">
+					{/* En-tête avec stats */}
+					<div className="flex items-center justify-between">
+						<div className="flex items-center gap-2">
+							<Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
+							<span className="text-sm font-medium text-gray-600 dark:text-gray-400">
+								{item.stats}
+							</span>
+						</div>
+					</div>
+
+					{/* Titre */}
+					<h3 className="text-2xl font-bold title-font text-gray-900 dark:text-white transition-all duration-300">
+						{item.title}
+					</h3>
+
+					{/* Description */}
+					<p className="text-gray-600 dark:text-gray-300 leading-relaxed line-clamp-3">
+						{item.description}
+					</p>
+
+					{/* Bouton d'action moderne */}
+					<motion.div
+						whileHover={{ scale: 1.02 }}
+						whileTap={{ scale: 0.98 }}
+						className="pt-4"
+					>
+						<Link href={item.link} className="block">
+							<Button
+								className={`w-full bg-gradient-to-r ${item.color} hover:shadow-xl text-white border-0 font-bold py-4 rounded-2xl transition-all duration-300 group/btn`}
+								size="lg"
+							>
+								<span className="flex items-center justify-center gap-3">
+									<Sparkles className="w-5 h-5" />
+									Découvrir maintenant
+									<motion.div
+										animate={{ x: isHovered ? 6 : 0 }}
+										transition={{ type: "spring", stiffness: 400 }}
+									>
+										<ArrowRight className="w-5 h-5" />
+									</motion.div>
+								</span>
+							</Button>
+						</Link>
+					</motion.div>
+				</div>
+				
+				{/* Effet de brillance au hover */}
+				<div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none">
+					<div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent transform -skew-x-12 translate-x-full group-hover:-translate-x-full transition-transform duration-1000"></div>
+				</div>
+			</div>
+			
+			{/* Ombre projetée */}
+			<div className={`absolute inset-0 bg-gradient-to-br ${item.color} rounded-3xl blur-2xl opacity-0 group-hover:opacity-20 transition-all duration-500 -z-10 translate-y-6`}></div>
+		</motion.div>
+	);
+}
+
 export function FeaturedSection() {
 	return (
-		<section className="py-20 bg-background">
-			<div className="container px-4 md:px-6">
-				<div className="grid gap-6 lg:grid-cols-2 lg:gap-12">
-					<AnimateOnScroll animation="slide-right">
-						<div className="space-y-2">
-							<h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight title-font">
-								Le meilleur de{" "}
-								<span className="text-primary">La grotte</span>
-							</h2>
-							<p className="max-w-[600px] text-muted-foreground md:text-xl">
-								Accède au meilleur du contenu de Juju en quelques instants.
-							</p>
-						</div>
+		<section className="py-24 bg-white dark:bg-gray-900 relative overflow-hidden">
+			{/* Éléments décoratifs de fond simplifiés */}
+			<div className="absolute inset-0 opacity-20">
+				<div className="absolute top-20 left-10 w-32 h-32 bg-emerald-500/5 rounded-full blur-2xl"></div>
+				<div className="absolute bottom-20 right-10 w-40 h-40 bg-purple-500/5 rounded-full blur-2xl"></div>
+				<div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-60 h-60 bg-orange-500/3 rounded-full blur-2xl"></div>
+			</div>
+			
+			<div className="container px-4 md:px-6 relative z-10">
+				{/* En-tête de section modernisé */}
+				<div className="text-center mb-20">
+					<AnimateOnScroll animation="smooth-reveal">
+						<motion.div 
+							className="inline-flex items-center gap-2 bg-gradient-to-r from-primary/10 to-purple-500/10 px-6 py-3 rounded-full mb-8 border border-primary/20"
+							whileHover={{ scale: 1.05 }}
+							transition={{ type: "spring", stiffness: 300 }}
+						>
+							<Sparkles className="w-5 h-5 text-primary animate-pulse" />
+							<span className="text-sm font-bold text-primary">Contenu Exclusif</span>
+						</motion.div>
 					</AnimateOnScroll>
-
-					<AnimateOnScroll animation="slide-left">
-						<div className="flex items-center justify-end">
-							<Link href="/series">
-								<Button
-									variant="outline"
-									className="btn-premium relative group overflow-hidden"
-								>
-									<span className="relative z-10 flex items-center gap-1">
-										Voir toutes les séries
-										<svg
-											xmlns="http://www.w3.org/2000/svg"
-											width="16"
-											height="16"
-											viewBox="0 0 24 24"
-											fill="none"
-											stroke="currentColor"
-											strokeWidth="2"
-											strokeLinecap="round"
-											strokeLinejoin="round"
-											className="transform transition-transform duration-300 group-hover:translate-x-1"
-										>
-											<path d="m9 18 6-6-6-6" />
-										</svg>
-									</span>
-									<span className="absolute inset-0 bg-gradient-to-r from-primary/20 to-primary/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-								</Button>
-							</Link>
-						</div>
+					
+					<AnimateOnScroll animation="crystal-emerge">
+						<h2 className="text-5xl md:text-6xl font-bold tracking-tight mb-8 title-font">
+							Trésors de{" "}
+							<span className="text-transparent bg-gradient-to-r from-primary via-purple-600 to-orange-500 bg-clip-text animate-pulse">
+								La Grotte
+							</span>
+						</h2>
+						<p className="max-w-3xl mx-auto text-xl text-muted-foreground leading-relaxed">
+							Explorez les créations les plus captivantes de Juju : comics palpitants, personnages attachants 
+							et animations époustouflantes vous attendent dans cette aventure extraordinaire !
+						</p>
 					</AnimateOnScroll>
 				</div>
-				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+
+				{/* Grille de cartes avec espacement optimisé */}
+				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-12">
 					{featuredItems.map((item, index) => (
 						<AnimateOnScroll
 							key={item.title}
-							animation="slide-up"
-							delay={0.1 * (index + 1)}
+							animation="glass-morph"
+							delay={0.2 * (index + 1)}
 						>
-							<Card className="overflow-hidden h-full flex flex-col">
-								<div className="aspect-video relative">
-									<Image
-										src={item.image}
-										alt={item.title}
-										fill
-										className="object-cover"
-									/>
-								</div>
-								<CardHeader className="flex-grow">
-									<CardTitle className="title-font">
-										{item.title}
-									</CardTitle>
-									<CardDescription>
-										{item.description}
-									</CardDescription>
-								</CardHeader>
-								<CardFooter>
-									<Link
-										href={item.link}
-										className="w-full"
-									>
-										<Button
-											className="w-full btn-card-premium group overflow-hidden"
-											variant="outline"
-										>
-											<span className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-out"></span>
-											<span className="relative z-10 flex items-center justify-center gap-2">
-												Découvrir
-												<svg
-													xmlns="http://www.w3.org/2000/svg"
-													width="16"
-													height="16"
-													viewBox="0 0 24 24"
-													fill="none"
-													stroke="currentColor"
-													strokeWidth="2"
-													strokeLinecap="round"
-													strokeLinejoin="round"
-													className="transform transition-transform duration-300 group-hover:translate-x-1"
-												>
-													<path d="m9 18 6-6-6-6" />
-												</svg>
-											</span>
-										</Button>
-									</Link>
-								</CardFooter>
-							</Card>
+							<FeatureCard item={item} index={index} />
 						</AnimateOnScroll>
 					))}
 				</div>
+
+
 			</div>
 		</section>
 	);

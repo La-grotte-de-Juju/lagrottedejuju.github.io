@@ -36,7 +36,7 @@ export default function BatlifeComicDetailPage() {
           </div>
         </motion.div>
 
-        <AnimateOnScroll animation="slide-down">
+        <AnimateOnScroll animation="glass-morph">
           <div className="mb-8 text-center">
             <h1 className="text-3xl md:text-4xl font-bold">Batlife - Une nuit à Tortueville</h1>
             <p className="mt-2 text-muted-foreground">Publié le 25 Février 2024</p>
@@ -44,7 +44,7 @@ export default function BatlifeComicDetailPage() {
         </AnimateOnScroll>
 
         <div className="max-w-4xl mx-auto space-y-8">
-          <AnimateOnScroll animation="fade" delay={0.2}>
+          <AnimateOnScroll animation="modern-fade" delay={0.2}>
             <div className="prose prose-lg dark:prose-invert mx-auto mb-6">
               <p>
                 Notre héros se retrouve au bar de Tortueville pour une soirée qui va prendre une tournure inattendue.
@@ -53,7 +53,7 @@ export default function BatlifeComicDetailPage() {
             </div>
           </AnimateOnScroll>
 
-          <AnimateOnScroll animation="scale" delay={0.3}>
+          <AnimateOnScroll animation="floating-card" delay={0.3}>
             <div className="rounded-xl overflow-hidden">
               <Image
                 src="/images/batlife-comic-2.jpg"
@@ -65,7 +65,7 @@ export default function BatlifeComicDetailPage() {
             </div>
           </AnimateOnScroll>
 
-          <AnimateOnScroll animation="fade" delay={0.4}>
+          <AnimateOnScroll animation="smooth-reveal" delay={0.4}>
             <div className="prose prose-lg dark:prose-invert mx-auto mt-6">
               <p>
                 Une fin de soirée qui laisse présager de nouvelles aventures pour nos personnages.
@@ -75,7 +75,7 @@ export default function BatlifeComicDetailPage() {
           </AnimateOnScroll>
         </div>
 
-        <AnimateOnScroll animation="slide-up" delay={0.5}>
+        <AnimateOnScroll animation="crystal-emerge" delay={0.5}>
           <div className="mt-12 p-6 border rounded-xl bg-muted/40">
             <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
               <Image
@@ -107,7 +107,7 @@ export default function BatlifeComicDetailPage() {
           </div>
         </AnimateOnScroll>
 
-        <AnimateOnScroll animation="slide-up" delay={0.6}>
+        <AnimateOnScroll animation="magnetic-pull" delay={0.6}>
           <div className="mt-12 flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t">
             <div>
               <Link href="/dessins/batlife-comics/le-depart">

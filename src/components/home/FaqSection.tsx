@@ -33,7 +33,7 @@ export function FaqSection() {
   return (
     <section className="py-20 bg-background">
       <div className="container px-4 md:px-6">
-        <AnimateOnScroll animation="slide-up">
+        <AnimateOnScroll animation="depth-push">
           <div className="mb-12 text-center">
             <h2 className="text-3xl font-bold tracking-tighter md:text-4xl title-font">
               Questions Fréquemment Posées
@@ -45,7 +45,7 @@ export function FaqSection() {
         </AnimateOnScroll>
         
         <div className="mx-auto max-w-3xl">
-          <AnimateOnScroll animation="scale" delay={0.2}>
+          <AnimateOnScroll animation="elastic-scale" delay={0.2}>
             <Accordion type="single" collapsible className="w-full">
               {faqs.map((faq, index) => (
                 <AccordionItem key={faq.id} value={faq.id}>

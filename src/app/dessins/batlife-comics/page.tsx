@@ -46,7 +46,7 @@ export default function BatlifeComicsPage() {
 	return (
 		<div className="py-12 md:py-16 lg:py-20">
 			<div className="container px-4 md:px-6">
-				<AnimateOnScroll animation="slide-down">
+				<AnimateOnScroll animation="liquid-rise" duration={1.0}>
 					<div className="flex flex-col items-center text-center mb-12 md:mb-16">
 						<h1 className="text-4xl md:text-5xl font-bold tracking-tighter mb-4">
 							Batlife Comics
@@ -59,7 +59,7 @@ export default function BatlifeComicsPage() {
 					</div>
 				</AnimateOnScroll>
 
-				<AnimateOnScroll animation="scale" delay={0.2}>
+				<AnimateOnScroll animation="glass-morph" delay={0.2} intensity={1.1}>
 					<div className="w-full max-w-4xl mx-auto aspect-[21/9] relative rounded-xl overflow-hidden mb-8">
 						<Image
 							src="/images/batlife-comic-1.jpg"
@@ -71,7 +71,7 @@ export default function BatlifeComicsPage() {
 					</div>
 				</AnimateOnScroll>
 
-				<AnimateOnScroll animation="slide-up" delay={0.3}>
+				<AnimateOnScroll animation="magnetic-pull" delay={0.3}>
 					<div className="flex flex-col sm:flex-row items-center justify-between mb-8 gap-4">
 						<h2 className="text-2xl font-bold">Tous les épisodes</h2>
 						<div className="flex items-center gap-4">
@@ -87,7 +87,7 @@ export default function BatlifeComicsPage() {
 
 				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 					{comics.map((comic, index) => (
-						<AnimateOnScroll key={comic.id} animation="slide-up" delay={0.1 * (index + 1)}>
+						<AnimateOnScroll key={comic.id} animation="floating-card" delay={0.1 * (index + 1)} intensity={0.8}>
 							<ShinyCard intensity={6} shineIntensity={0.35} className="h-full">
 								<Card className="h-full flex flex-col border-0 shadow-none">
 									<div className="aspect-[4/3] relative">

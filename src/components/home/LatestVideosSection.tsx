@@ -39,7 +39,7 @@ export function LatestVideosSection() {
 		<section className="py-20 bg-background">
 			<div className="container px-4 md:px-6">
 				<div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
-					<AnimateOnScroll animation="slide-right">
+					<AnimateOnScroll animation="apple-slide">
 						<div className="space-y-2">
 							<h2 className="text-3xl font-bold tracking-tighter md:text-4xl title-font">
 								Dernières{" "}
@@ -51,7 +51,7 @@ export function LatestVideosSection() {
 							</p>
 						</div>
 					</AnimateOnScroll>
-					<AnimateOnScroll animation="slide-left">
+					<AnimateOnScroll animation="magnetic-pull">
 						<Link href="/actu/dernieres-videos" prefetch={false}>
 							<Button variant="outline" size="lg" className="gap-2">
 								Voir toutes les vidéos
@@ -64,7 +64,7 @@ export function LatestVideosSection() {
 					{latestVideos.map((video, index) => (
 						<AnimateOnScroll
 							key={video.id}
-							animation="scale"
+							animation="floating-card"
 							delay={0.2 * (index + 1)}
 						>
 							<Card className="overflow-hidden">
