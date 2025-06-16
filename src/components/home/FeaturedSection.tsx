@@ -5,20 +5,18 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import AnimateOnScroll from "@/components/animation/AnimateOnScroll";
 import { motion } from "framer-motion";
-import { BookOpen, Users, Film, Sparkles, Star, ArrowRight } from "lucide-react";
+import { BookOpen, Users, Film, Sparkles, ArrowRight } from "lucide-react";
 import { useState } from "react";
 
 const featuredItems = [
 	{
-		title: "Bibliothèque de Comics",
+		title: "Bibliothèque de La Grotte",
 		description: "Plongez dans l'univers captivant de Batlife à travers des bandes dessinées pleines d'humour et d'aventures épiques.",
 		image: "/images/animation/Strip-grotte-Visual.gif",
-		link: "/dessins/batlife-comics",
+		link: "/bd",
 		icon: BookOpen,
 		category: "BD & Comics",
-		color: "from-emerald-500 to-teal-600",
-		stats: "25+ Comics",
-		bgPattern: "bg-emerald-50 dark:bg-emerald-950/20"
+		color: "from-emerald-500 to-teal-600",		bgPattern: "bg-emerald-50 dark:bg-emerald-950/20"
 	},
 	{
 		title: "Galerie des Héros",
@@ -28,7 +26,6 @@ const featuredItems = [
 		icon: Users,
 		category: "Personnages",
 		color: "from-purple-500 to-indigo-600",
-		stats: "12 Personnages",
 		bgPattern: "bg-purple-50 dark:bg-purple-950/20"
 	},
 	{
@@ -39,7 +36,6 @@ const featuredItems = [
 		icon: Film,
 		category: "Animations",
 		color: "from-orange-500 to-red-600",
-		stats: "8 Épisodes",
 		bgPattern: "bg-orange-50 dark:bg-orange-950/20"
 	},
 ];
@@ -77,20 +73,8 @@ function FeatureCard({ item, index }: { item: typeof featuredItems[0], index: nu
 							{item.category}
 						</div>
 					</div>
-				</div>
-
-				{/* Contenu avec design moderne */}
+				</div>				{/* Contenu avec design moderne */}
 				<div className="p-8 space-y-4">
-					{/* En-tête avec stats */}
-					<div className="flex items-center justify-between">
-						<div className="flex items-center gap-2">
-							<Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-							<span className="text-sm font-medium text-gray-600 dark:text-gray-400">
-								{item.stats}
-							</span>
-						</div>
-					</div>
-
 					{/* Titre */}
 					<h3 className="text-2xl font-bold title-font text-gray-900 dark:text-white transition-all duration-300">
 						{item.title}
@@ -161,18 +145,47 @@ export function FeaturedSection() {
 							<Sparkles className="w-5 h-5 text-primary animate-pulse" />
 							<span className="text-sm font-bold text-primary">Contenu Exclusif</span>
 						</motion.div>
-					</AnimateOnScroll>
-					
-					<AnimateOnScroll animation="crystal-emerge">
+					</AnimateOnScroll>					<AnimateOnScroll animation="crystal-emerge">
 						<h2 className="text-5xl md:text-6xl font-bold tracking-tight mb-8 title-font">
-							Trésors de{" "}
-							<span className="text-transparent bg-gradient-to-r from-primary via-purple-600 to-orange-500 bg-clip-text animate-pulse">
-								La Grotte
+							L'univers de{" "}
+							<span className="relative inline-block">
+								<span className="text-transparent bg-gradient-to-r from-primary via-purple-600 to-orange-500 bg-clip-text animate-pulse relative z-10">
+									La Grotte
+								</span>								{/* Effet de glow multiple couches avec flou plus intense */}
+								<span 
+									className="absolute inset-0 bg-gradient-to-r from-primary via-purple-600 to-orange-500 bg-clip-text text-transparent blur-md opacity-40 animate-pulse"
+									aria-hidden="true"
+								>
+									La Grotte
+								</span>
+								<span 
+									className="absolute inset-0 bg-gradient-to-r from-primary via-purple-600 to-orange-500 bg-clip-text text-transparent blur-lg opacity-35 animate-pulse"
+									aria-hidden="true"
+								>
+									La Grotte
+								</span>
+								<span 
+									className="absolute inset-0 bg-gradient-to-r from-primary via-purple-600 to-orange-500 bg-clip-text text-transparent blur-xl opacity-30 animate-pulse"
+									aria-hidden="true"
+								>
+									La Grotte
+								</span>
+								<span 
+									className="absolute inset-0 bg-gradient-to-r from-primary via-purple-600 to-orange-500 bg-clip-text text-transparent blur-2xl opacity-25 animate-pulse"
+									aria-hidden="true"
+								>
+									La Grotte
+								</span>
+								<span 
+									className="absolute inset-0 bg-gradient-to-r from-primary via-purple-600 to-orange-500 bg-clip-text text-transparent blur-3xl opacity-15 animate-pulse"
+									aria-hidden="true"
+								>
+									La Grotte
+								</span>
 							</span>
 						</h2>
 						<p className="max-w-3xl mx-auto text-xl text-muted-foreground leading-relaxed">
-							Explorez les créations les plus captivantes de Juju : comics palpitants, personnages attachants 
-							et animations époustouflantes vous attendent dans cette aventure extraordinaire !
+							Retrouve le meilleur de la grotte, tout en un seul endroit. 
 						</p>
 					</AnimateOnScroll>
 				</div>

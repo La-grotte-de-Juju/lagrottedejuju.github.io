@@ -1,0 +1,25 @@
+{
+  "version": "1.0",
+  "updated": "2025-06-02",
+  "folders": [
+    {
+      "name": "Grand Strip",
+      "path": "BD/Grand Strip",
+      "coverImage": "https://raw.githubusercontent.com/La-grotte-de-Juju/La-grotte-de-Juju-Ressources/main/BD/Grand%20Strip/STRIP.png",
+      "pages": [
+        "https://raw.githubusercontent.com/La-grotte-de-Juju/La-grotte-de-Juju-Ressources/main/BD/Grand%20Strip/STRIP.png",
+        "https://raw.githubusercontent.com/La-grotte-de-Juju/La-grotte-de-Juju-Ressources/main/BD/Grand%20Strip/STRIP2.png",
+        "https://raw.githubusercontent.com/La-grotte-de-Juju/La-grotte-de-Juju-Ressources/main/BD/Grand%20Strip/STRIP3.png",
+        "https://raw.githubusercontent.com/La-grotte-de-Juju/La-grotte-de-Juju-Ressources/main/BD/Grand%20Strip/STRIP4.png",
+        "https://raw.githubusercontent.com/La-grotte-de-Juju/La-grotte-de-Juju-Ressources/main/BD/Grand%20Strip/BD5.png",
+        "https://raw.githubusercontent.com/La-grotte-de-Juju/La-grotte-de-Juju-Ressources/main/BD/Grand%20Strip/STRIP6.png",
+        "https://raw.githubusercontent.com/La-grotte-de-Juju/La-grotte-de-Juju-Ressources/main/BD/Grand%20Strip/STRIP7.png",
+        "https://raw.githubusercontent.com/La-grotte-de-Juju/La-grotte-de-Juju-Ressources/main/BD/Grand%20Strip/STRIP8.png", 
+        "https://raw.githubusercontent.com/La-grotte-de-Juju/La-grotte-de-Juju-Ressources/main/BD/Grand%20Strip/STRIP9.png",
+        "https://raw.githubusercontent.com/La-grotte-de-Juju/La-grotte-de-Juju-Ressources/main/BD/Grand%20Strip/STRIP10.png"
+      ],
+      "description": "Série de strips humoristiques originaux de La Grotte de Juju",
+      "createdAt": "2024-05-15T00:00:00Z"
+    }
+  ]
+}

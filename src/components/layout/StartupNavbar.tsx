@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { Link as LinkIcon, Menu as MenuIcon, X, Image as ImageIcon, BookText, Lightbulb } from 'lucide-react';
+import { Link as LinkIcon, Menu as MenuIcon, X, Image as ImageIcon, BookText, Lightbulb, LibraryBig } from 'lucide-react';
 import { motion, AnimatePresence, MotionStyle } from 'framer-motion';
 import {
   Sheet,
@@ -291,12 +291,12 @@ const StartupNavbar: React.FC = () => {
                             </Link>
                           </SheetClose>
                         </div>
-                      </div>
-                      <SheetClose asChild>
+                      </div>                      <SheetClose asChild>
                         <Link 
-                          href="/bibliotheque" 
+                          href="/bd" 
                           className="text-gray-700 dark:text-gray-300 hover:bg-gray-100/70 dark:hover:bg-gray-800/70 px-3 py-2.5 rounded-md text-base font-medium flex items-center transition-all hover:pl-4"
                         >
+                          <LibraryBig className="mr-2 h-4 w-4" />
                           Bibliothèque
                         </Link>
                       </SheetClose>

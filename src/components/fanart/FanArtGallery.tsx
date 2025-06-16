@@ -534,14 +534,54 @@ export default function FanArtGallery() {
             >
               <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
               {refreshing ? 'Mise à jour...' : 'Rafraîchir les images'}
-            </button>
-            <button
+            </button>            <button
               onClick={handleClearCache}
               className="w-full py-2 px-3 flex items-center justify-center gap-2 text-sm font-medium rounded-md bg-yellow-100 hover:bg-yellow-200 dark:bg-yellow-900/30 dark:hover:bg-yellow-800/40 text-yellow-600 dark:text-yellow-300 hover:text-yellow-700"
             >
               <AlertTriangle className="h-4 w-4" />
               Vider le cache des images
             </button>
+          </div>
+          
+          {/* Message d'invitation pour les créateurs de fan art */}
+          <div className="mt-6">
+            <div className="relative overflow-hidden rounded-lg">
+              <div
+                className="p-5 text-center relative"
+                style={{
+                  background: 'linear-gradient(to right, rgba(199, 210, 254, 0.8), rgba(221, 214, 254, 0.8), rgba(251, 207, 232, 0.8))',
+                  backgroundSize: '200% 200%',
+                  animation: 'gradientBg 8s ease infinite'
+                }}
+              >
+                <div 
+                  className="absolute inset-0 pointer-events-none rounded-sm"
+                  style={{ 
+                    boxShadow: 'inset 0 0 0 2px rgba(255, 255, 255, 0.6)'
+                  }}
+                ></div>
+                <p className="font-medium relative text-sm">
+                  <span style={{ 
+                    background: 'linear-gradient(to right, #4f46e5, #9333ea, #db2777)', 
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    backgroundSize: '200% 200%',
+                    animation: 'gradientBg 8s ease infinite'
+                  }}>
+                    Tu as créé un fan art ? Partage ta création avec nous sur les réseaux sociaux ou contacte-nous directement pour l'ajouter à la galerie !
+                  </span>
+                </p>
+              </div>
+              <div 
+                className="absolute -bottom-4 -z-10 left-2 right-2 h-8 blur-xl opacity-40"
+                style={{
+                  background: 'linear-gradient(to right, rgba(199, 210, 254, 0.6), rgba(221, 214, 254, 0.6), rgba(251, 207, 232, 0.6))',
+                  backgroundSize: '200% 200%',
+                  animation: 'gradientBg 8s ease infinite',
+                  transformOrigin: 'center bottom'
+                }}
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -621,43 +661,6 @@ export default function FanArtGallery() {
           )}
         </div>
         <div className="mb-8 mx-4">
-          <div className="relative overflow-hidden rounded-lg">
-            <div
-              className="p-5 text-center relative"
-              style={{
-                background: 'linear-gradient(to right, rgba(199, 210, 254, 0.8), rgba(221, 214, 254, 0.8), rgba(251, 207, 232, 0.8))',
-                backgroundSize: '200% 200%',
-                animation: 'gradientBg 8s ease infinite'
-              }}
-            >
-              <div 
-                className="absolute inset-0 pointer-events-none rounded-sm"
-                style={{ 
-                  boxShadow: 'inset 0 0 0 2px rgba(255, 255, 255, 0.6)'
-                }}
-              ></div>
-              <p className="font-medium relative">
-                <span style={{ 
-                  background: 'linear-gradient(to right, #4f46e5, #9333ea, #db2777)', 
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundSize: '200% 200%',
-                  animation: 'gradientBg 8s ease infinite'
-                }}>
-                  Tu as créé un fan art ? Partage ta création avec nous sur les réseaux sociaux ou contacte-nous directement pour l'ajouter à la galerie !
-                </span>
-              </p>
-            </div>
-            <div 
-              className="absolute -bottom-4 -z-10 left-2 right-2 h-8 blur-xl opacity-40"
-              style={{
-                background: 'linear-gradient(to right, rgba(199, 210, 254, 0.6), rgba(221, 214, 254, 0.6), rgba(251, 207, 232, 0.6))',
-                backgroundSize: '200% 200%',
-                animation: 'gradientBg 8s ease infinite',
-                transformOrigin: 'center bottom'
-              }}
-            />
-          </div>
           <style jsx>{`
             @keyframes gradientBg {
               0% {
